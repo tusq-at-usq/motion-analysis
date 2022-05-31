@@ -23,9 +23,9 @@ https://github.com/andrewjlock/sysopt
 
 ### Integrator
 
-Integrates the continuous-time dynamic equations to get the model-estimated state.
+Integrates the continuous-time dynamic equations to get the model-estimated state. 
 
-$$ {\boldsymbol{x'}}_k = f(\boldsymbol{x}_{k-1}) $$
+$$ \boldsymbol{x'}_k = f( \boldsymbol{x} _{k-1} ) $$
 
 ### Kalman filter
 
@@ -57,8 +57,10 @@ These directions apply to local and body coordiantes.
 ##### `Point()`
 All points are fixed to the rigid body, and are translated and rotated with the body
 
-$$ \boldsymbol{P}^\mathrm{L} = [\boldsymbol{T}]^\mathrm{BL} \boldsymbol{P}^\mathrm{B} + s^\mathrm{B}_\mathrm{L} $$
-where $[\boldsymbol{T}]^\mathrm{BL}$ is the rotation tensor from vehicle body frame to local frame in local coordinates, and $s^\mathrm{B}_\mathrm{L}$ is the position of the vehicle centre of gravity in local coordiantes. 
+$$ \boldsymbol{p} ^\mathrm{L} = [\boldsymbol{T}] ^\mathrm{LB} \boldsymbol{p} ^\mathrm{B} + s ^\mathrm{B} _\mathrm{L} $$
+
+
+where $[\boldsymbol{T}] ^\mathrm{LB}$ is the rotation tensor from vehicle body frame to local frame in local coordinates, and $s ^\mathrm{B} _\mathrm{L}$ is the position of the vehicle centre of gravity in local coordiantes. 
 
 ##### `Surface()`
 A surface is made of 3 or more points, ordered in a counter-clockwise direction for an ourward surface normal vector (right hand rule).
@@ -78,7 +80,7 @@ The body includes an `update(X,Q)` routine, which updates the local position of 
 
 #### Views
 A view object is a 2D projection of the vehicle blobs.
-Views are defined by their Euler rotation, with rotation vector [0,0,0] looking down on the model towards the local coordinate origin facing north.
+Views are defined by their Euler rotation, with rotation vector $[0,0,0]$ looking down on the model towards the local coordinate origin facing north.
 In this model Euler angles are rotations about the vehicle z, y and x axis (in that order).
 Mutliple different views of the same body can be defined. 
 
@@ -88,7 +90,7 @@ Note: Currently only parallel view (i.e.schlieren) is supported.
 Future development will support perspective views.
 
 ## Spatial matching
-Spatial matching is the process of determining a measured position $[x,y,z]^\mathrm{L}$ and rotation in quaternions $[q_0,q_1,q_2,q_3]^\mathrm{BL}$.
+Spatial matching is the process of determining a measured position $[x,y,z] ^\mathrm{L}$ and rotation in quaternions $[q_0,q_1,q_2,q_3] ^\mathrm{BL}$.
 
 
 
