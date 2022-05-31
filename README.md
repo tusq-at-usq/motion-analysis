@@ -11,7 +11,7 @@ More info to come...
 ## Dynamic system
 | Input | Outout | 
 | --- | --- |
-| - | $\frac{d}{dt}\boldmath{x} = \boldmath{f}(\boldmath{x}) | 
+| - | $\frac{d}{dt}\boldmath{x} = \boldmath{f}(\boldmath{x})$ | 
 
 ### Sysopt dynamic model
 
