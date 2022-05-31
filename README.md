@@ -25,7 +25,7 @@ https://github.com/andrewjlock/sysopt
 
 Integrates the continuous-time dynamic equations to get the model-estimated state.
 
-$$ \boldsymbol{x}'_k = f(\boldsymbol{x}_{k-1}) $$
+$ \boldsymbol{x}'_k = f(\boldsymbol{x}_{k-1}) $
 
 ### Kalman filter
 
