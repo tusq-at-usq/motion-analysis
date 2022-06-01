@@ -5,10 +5,10 @@ A selection of Python tools used to analyse object motion, intended predominantl
 ## Install
 
 Clone the repository:
-'git clone https://github.com/tusq-at-usq/motion-analysis'
+`git clone https://github.com/tusq-at-usq/motion-analysis`
 
 Install using pip in editable mode:
-'python3 -m pip install -e ./'
+`python3 -m pip install -e ./`
 
 Please contact Andy (andrew.lock@usq.edu.au) if you encounter any install issues.
 
@@ -16,8 +16,8 @@ Please contact Andy (andrew.lock@usq.edu.au) if you encounter any install issues
 
 This repository contains the following Python packages
 
-* ['motiontrack'](/src/motiontrack/README.md)
-* ['blobdetect'](/src/blobdetect/README.md)
+* [`motiontrack`](/src/motiontrack/README.md)
+* [`blobdetect`](/src/blobdetect/README.md)
 * (more to be included)
 
 ## Dependencies 
@@ -27,5 +27,5 @@ TBC.
 
 ## Documentation 
 
-Further details of each main component can be found in the ['lib' README](lib/README.md)
+Documentation to be added to [`/Docs`](\Docs\)
 
