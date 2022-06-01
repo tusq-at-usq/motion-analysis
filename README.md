@@ -27,5 +27,5 @@ TBC.
 
 ## Documentation 
 
-Documentation to be added to [`/Docs`](/Docs/)
+Documentation to be added to [`docs`](/docs/)
 
