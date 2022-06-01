@@ -1,8 +1,8 @@
-from geometry import *
-from vehicle_image_generation import *
+from motiontrack.geometry import *
+from motiontrack.vehicle_image_generation import *
 from matplotlib import pyplot as plt
 
-from utils import *
+from motiontrack.utils import *
 
 """ Example geometry projection
 This code shows an example of how the geometry is projected by the viewpoint.
@@ -41,6 +41,7 @@ def show_camera_viewpoints():
         V.plot_vehicle()
     plt.pause(0.1)
     input("Press to close:")
+    plt.close('all')
 
 def create_example_view_rotation():
     G = pyramid_gen(1)
@@ -57,11 +58,12 @@ def create_example_view_rotation():
         r3.append(euler_to_quaternion(1.75*np.pi,1.75*np.pi,angle))
 
     q_ar = r1+r2+r3
+    titles = ["z rotation"]*100 + ["y rotation"]*100 + ["x rotation"]*100
 
-    for q in q_ar:
+    for q,title in zip(q_ar,titles):
         G.update([0,0,0],q,0)
         V.update()
-        V.plot_vehicle()
+        V.plot_vehicle(title)
 
     
 show_camera_viewpoints()

@@ -8,9 +8,10 @@ from getopt import getopt
 import sys
 import os
 
-from utils import *
+from motiontrack.utils import *
+from motiontrack.read_data import Blobs2D
 
-""" ViewPOINT GENERATION 
+""" View generation
 DEPENDENCIES:
 Python package "Pillow" (i.e. pip3 install Pillow)
 Pyton package "ffmpeg" (i.e. pip3 install ffmpeg)
@@ -56,7 +57,8 @@ class View:
                  dirName="default",
                  saveSwitch=False,
                  scale=1,
-                 perspective="parallel"):
+                 perspective="parallel",
+                 offset = 0):
         self.perspective=perspective
         self.viewAngle = viewAngle
         self.s_LV = [] # Vector from local origin to camera origin in local coordinates
@@ -70,6 +72,7 @@ class View:
         self.artists = []
         self.blobSize = B.blobSize
         self.scale = scale  #Scale of the view image in pixels/m
+        self.offset = offset # Placeholder offset
         self.initialisation()
 
     def initialisation(self):
@@ -114,23 +117,22 @@ class View:
         self.centPoint = np.matmul(self.T_VL,self.B.X)
         self.axisPoints = [np.matmul(self.T_VL,ax.XL) for ax in self.B.axis]
 
-    #  def get_2D_data(self):
-        #  # Get 2D projection coordinates from 3D coordinates
-        #  Xs = []
-        #  Ys = []
-        #  Ds = []
-        #  for blobs,blobSize in zip(np.array(self.all_blobs),self.blob_sizes):
-            #  if len(blobs)>0:
-                #  #TODO: Why is column 1 X, and 0 Y?
-                #  Xs.append(blobs[:,0])
-                #  Ys.append(blobs[:,0])
-                #  D = np.empty((blobs[:,1].size))
-                #  D.fill(blobSize)
-                #  Ds.append(D)
-        #  Xs = np.array(Xs).flatten()
-        #  Ys = np.array(Ys).flatten()
-        #  Ds = np.array(Ds).flatten()
-        #  return Xs,Ys,Ds
+    def get_2D_data(self):
+        # Get 2D projection coordinates from 3D coordinates
+        Xs = []
+        Ys = []
+        Ds = []
+        for blobs,blobSize in zip(np.array(self.all_blobs),self.blob_sizes):
+            if len(blobs)>0:
+                Xs.append(blobs[:,1])
+                Ys.append(blobs[:,0])
+                D = np.empty((blobs[:,1].size))
+                D.fill(blobSize)
+                Ds.append(D)
+        Xs = np.array(Xs).flatten()
+        Ys = np.array(Ys).flatten()
+        Ds = np.array(Ds).flatten()
+        return Blobs2D(np.array([Xs,Ys]),Ds)
 
     def plot_frame(self):
         # Save a frame of an animation
@@ -150,7 +152,7 @@ class View:
         self.artists.append(fillArtists + blobArtists)
         return fillArtists + blobArtists
 
-    def plot_vehicle(self):
+    def plot_vehicle(self,title=None):
         # Plot a visualisation of the vehicle outline and blobs
         if not hasattr(self,"fig"):
             self.initialise_plot()
@@ -173,7 +175,9 @@ class View:
                                   width=0.01)
             self.ax.annotate(label, xy=(axis[1], axis[0]))
 
-
+        if not title:
+            title = self.name
+        self.ax.set_title(title)
         plt.pause(0.01)
         self.fig.canvas.draw()
 

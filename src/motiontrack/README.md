@@ -1,7 +1,6 @@
 # `motiontrack`
 
 A framework for tracking vehicle motion using measured data (initially blob point tracking). 
-
 The structure of the code is shown below: 
 ![alt text](../../docs/img/tracker_screenshot.png?raw=true "tracker_outline")
 (*This image to be updated/improved*)
@@ -9,6 +8,9 @@ The structure of the code is shown below:
 Each block shown is a separate module, and is described in further detail below.
 
 More info to come...
+
+
+
 
 
 Below is a description of each module
@@ -23,9 +25,9 @@ https://github.com/andrewjlock/sysopt
 ## Integrator
 
 Integrates the continuous-time dynamic equations to get the model-estimated state. 
-
-$$ \boldsymbol{x'}_k = f( \boldsymbol{x} _{k-1} ) $$
-
+ 
+$$ \boldsymbol{x'} _k = f( \boldsymbol{x} _{k-1} ) $$
+ 
 ## Kalman filter
 
 Uses an Unscented Kalman filter to track the vehicle motion and combine measurement data with model predictions.
@@ -89,6 +91,7 @@ Note: Currently only parallel view (i.e.schlieren) is supported.
 Future development will support perspective views.
 
 # Spatial matching
+
 Spatial matching is the process of determining a measured position $[x,y,z] ^\mathrm{L}$ and rotation in quaternions $[q_0,q_1,q_2,q_3] ^\mathrm{BL}$.
 
 

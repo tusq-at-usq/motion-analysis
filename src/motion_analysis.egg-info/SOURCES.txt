@@ -1,0 +1,16 @@
+LICENSE
+README.md
+setup.cfg
+setup.py
+src/blobdetect/__init__.py
+src/motion_analysis.egg-info/PKG-INFO
+src/motion_analysis.egg-info/SOURCES.txt
+src/motion_analysis.egg-info/dependency_links.txt
+src/motion_analysis.egg-info/requires.txt
+src/motion_analysis.egg-info/top_level.txt
+src/motiontrack/__init__.py
+src/motiontrack/geometry.py
+src/motiontrack/read_data.py
+src/motiontrack/spatial_match.py
+src/motiontrack/utils.py
+src/motiontrack/vehicle_image_generation.py

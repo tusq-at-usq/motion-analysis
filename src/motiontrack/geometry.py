@@ -143,8 +143,9 @@ class Body:
         [p.initialise(XI,T_CS) for p in self.points]
         [b.initialise(XI,T_CS) for b in self.blobs]
 
-    def update(self,X,Q,t):
-        self.t = t
+    def update(self,X,Q,t=None):
+        if t:
+            self.t = t
         self.X = X
         if all(q == 0 for q in Q):
             # Creating T_BL for no translation results in a [0] matrix
@@ -286,20 +287,21 @@ def pyramid_gen(L,blob_location_filename=None):
 def cubeGen(L,blob_location_filename=None):
     # An example cube vehicle shape
     p0 = Point([0,0,0])
-    p1 = Point([0,2,0])
-    p2 = Point([1,2,0])
-    p3 = Point([2,0,0])
+    p1 = Point([0,1,0])
+    p2 = Point([1,1,0])
+    p3 = Point([1,0,0])
     p4 = Point([0,0,1])
-    p5 = Point([0,2,1])
-    p6 = Point([1,2,1])
-    p7 = Point([2,0,1])
+    p5 = Point([0,1,1])
+    p6 = Point([1,1,1])
+    p7 = Point([1,0,1])
 
-    #  pX  = Point([1.333,1,0.5])
-    #  pY  = Point([0.333,2,0.5])
-    #  pZ  = Point([0.333,1,1.5])
+    pX  = Point([1.5,0.5,0.5])
+    pY  = Point([0.5,1.5,0.5])
+    pZ  = Point([0.5,0.5,1.5])
     # TODO: Fix for cube
 
     points = [p0,p1,p2,p3,p4,p5,p6,p7,pX,pY,pZ]
+    axis = [pX,pY,pZ]
     
     # Scale by length
     for p in points:
@@ -328,6 +330,7 @@ def cubeGen(L,blob_location_filename=None):
             print("Saved new blob locations as 'blob_XYs.npy'")
     else:
         blob_coords = np.load(blob_location_filename)
+        print("Loaded blob locations from:",blob_location_filename)
 
     for surf,coord in zip(surfs,blob_coords):
         blobXs = coord[0]

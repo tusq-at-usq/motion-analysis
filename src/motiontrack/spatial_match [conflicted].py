@@ -24,52 +24,52 @@ class SpatialMatch:
         self.Vs = Vs
         self.n_V = len(Vs)
 
-    def run_match(self,blob_data,p_est,Q_est,plot=0):
+    def run_match(self,blob_data,r_est,Q_est,plot=0):
         if len(blob_data) != self.n_V:
             print("ERROR: number of blob frames does not match viewpoints")
             raise ValueError
-        p,Q = self.match_alg1(blob_data,p_est,Q_est,plot)
-        return p,Q
+        self.match_alg1(blob_data,r_est,Q_est,plot)
+        # Code to find state X which matches blob locations.
+        pass
 
-    def match_alg1(self,blob_data,p0,Q0,plot_flag=False):
+    def match_alg1(self,blob_data,r0,Q0,plot_flag=False):
         # A simple traker which solves translation and rotation simultaneously
         # TODO: We may develop alternative spatial match algorithms in the future
 
         # Extract the blob data from the  into 'unfiltered' lists
-        X_ds_unfilt = []
-        Y_ds_unfilt = []
-        D_ds_unfilt = []
+        X_ims_unfilt = []
+        Y_ims_unfilt = []
+        D_ims_unfilt = []
         for blobs in blob_data:
-            X_d = blobs.p[0]
-            Y_d = blobs.p[1]
-            D_d = blobs.D
-            X_ds_unfilt.append(X_d)
-            Y_ds_unfilt.append(Y_d)
-            D_ds_unfilt.append(D_d)
+            X_im = blobs.r[0]
+            Y_im = blobs.r[1]
+            D_im = blobs.D
+            X_ims_unfilt.append(X_im)
+            Y_ims_unfilt.append(Y_im)
+            D_ims_unfilt.append(D_im)
 
         # Filtering step - use a subselection of data blobs 
         # TODO: This step could probably be improved for robustness
-        # TODO: Improve notation with 2D position vectors
-        X_ds=[]; Y_ds=[]; D_ds=[]
+        X_ims=[]; Y_ims=[]; D_ims=[]
         for i in range(self.n_V):
             view = self.Vs[i]
-            X_d = X_ds_unfilt[i]
-            Y_d = Y_ds_unfilt[i]
-            D_d = D_ds_unfilt[i]
+            X_im = X_ims_unfilt[i]
+            Y_im = Y_ims_unfilt[i]
+            D_im = D_ims_unfilt[i]
 
             # Update model and views
-            p = np.array(p0) + view.offset 
-            self.B.update(p,Q0)
+            r = np.array(r0) + view.offset 
+            self.B.update(r,Q0)
             view.update()
-            p_p = getattr(view.get_2D_data(),'p')
+            r_i,D_i = getattr(view.get_2D_data(),'r','D')
 
-            D = np.array(D_d)*view.scale # Diameters from image
-            p_p = p_p * view.scale # Blob vectors from projection
-            p_d = np.array([X_d,Y_d]).T # Blob vectors from measured data
+            D = np.array(D_im)*view.scale # Diameters from image
+            r_i = r_i * view.scale # Blob vectors from projection
+            r_im = np.array([X_im,Y_im]).T # Blob vectors from measured data
 
             # Find the distancer between each combination of blobs
-            X_dif = np.subtract.outer(p_p[0],p_d.T[0])
-            Y_dif = np.subtract.outer(p_p[1],p_d.T[1])
+            X_dif = np.subtract.outer(r_i.T[0],r_im.T[0])
+            Y_dif = np.subtract.outer(r_i.T[1],r_im.T[1])
             r_dif = (X_dif**2 + Y_dif**2)**0.5
 
             # Find the closest image blob to each model blob
@@ -77,9 +77,9 @@ class SpatialMatch:
             pairs = list(set([np.argmin(r) for r in r_dif]))
 
             # Only use the image blobs closest to the projected blobs 
-            X_ds.append([X_d[i] for i in pairs])
-            Y_ds.append([Y_d[i] for i in pairs])
-            D_ds.append([D_d[i] for i in pairs])
+            X_ims.append([X_im[i] for i in pairs])
+            Y_ims.append([Y_im[i] for i in pairs])
+            D_ims.append([D_im[i] for i in pairs])
 
         def get_cost(C):
             #TODO: Check this is the appropriate normalisation of quaternions. 
@@ -87,37 +87,34 @@ class SpatialMatch:
             Qs = Q0 * C[0:4]
             Qs = np.array(Qs)/np.linalg.norm(Qs)
             error = 0
-            #  for view,X_d,Y_d,D_d,offset in zip(self.views,X_ds,Y_ds,D_ds,self.offsets):
+            #  for view,X_im,Y_im,D_im,offset in zip(self.views,X_ims,Y_ims,D_ims,self.offsets):
             for i in range(self.n_V):
                 view = self.Vs[i]
-                X_d = X_ds[i]
-                Y_d = Y_ds[i]
-                D_d = D_ds[i]
+                X_im = X_ims[i]
+                Y_im = Y_ims[i]
+                D_im = D_ims[i]
 
-                ps = p0 * C[4:7]
-                ps = ps + view.offset
-                self.B.update(ps,Qs)
+                rs = r0 * C[4:7]
+                rs = rs + view.offset
+                self.B.update(rs,Qs)
                 view.update()
-                blobs = view.get_2D_data()
-                p_p = blobs.p
+                r_p,D_p = getattr(view.get_2D_data(),'r','D')
 
                 blob_map = []
                 min_norms = []
-                p_p = p_p*view.scale
-                for x,y,d in zip(X_d,Y_d,D_d): # Iterate through image blobs
-                    # TODO: It wold be better to construct a matrix of distances
-                    # and start from the closest blob. Instead of starting with 
-                    # an arbitrary blob.
-                    if len(p_p) > 0:
-                        p_d = np.array([x,y])
-                        delta_r = p_p.T - p_d
+                r_ps = r_p*view.scale
+                for x,y,d in zip(X_im,Y_im,D_im): # Iterate through image blobs
+                    if len(r_ps) > 0:
+                        r_im = [x,y]
+                        breakpoint()
+                        delta_r = r_ps - r_im
                         norms = np.linalg.norm(delta_r,axis=1) # Distance image blob and projected blobs
                         blob_map.append(np.argmin(norms))
                         j = np.argmin(norms)
-                        p_p = np.delete(p_p,j,axis=1) # Option: only allow each dot to be used once
+                        # r_ps = np.delete(r_ps,j,axis=0) # Option: only allow each dot to be used once
                         min_norms.append(np.min(norms)**2) 
-                        # OPTIONAL: Weight by surface norm
-                error_ = np.mean(min_norms[0:np.min((blobs.n,blobs.n))])
+                        # TODO: Weight by surface norm
+                error_ = np.mean(min_norms[0:np.min((len(X_im),len(X_p)))])
                 error = error + error_
             return error
 
@@ -125,34 +122,32 @@ class SpatialMatch:
             blob_fig,axs = plt.subplots(1,2)
             axs.flatten()
             def plot(X):
-                for view,ax,X_d,Y_d,D_d in zip(self.Vs,axs,X_ds,Y_ds,D_ds):
+                for view,ax,X_im,Y_im,D_im in zip(self.views,axs,X_ims,Y_ims,D_ims):
                     ax.clear()
-                    #  ax.scatter(X_d,Y_d,s=D,facecolors='none',edgecolor='k',)
-                    blobs = view.get_2D_data()
-                    p_p = blobs.p #* view.scale
-                    D_p = blobs.D *500
-
-                    proj = ax.scatter(p_p[0],p_p[1],s=D_p,color='r',label='projected')
+                    D = np.array(D_im)*view.scale
+                    ax.scatter(X_im,Y_im,s=D,facecolors='none',edgecolor='k',)
+                    X_p,Y_p,D_p = view.get_2D_data()
+                    r_ps = np.array([X_p,Y_p]).T
+                    r_ps = r_ps * view.scale
+                    ax.scatter(r_ps[:,0],r_ps[:,1],color='r')
                     ax.set_aspect("equal")
                     ax.set_title(view.name)
-
-                    D_d = np.array(D_d)*view.scale*800
-                    data = ax.scatter(X_d,Y_d,s=D_d,facecolors='none',edgecolor='k',label='data')
-                plt.pause(0.01)
+                plt.pause(0.001)
                 blob_fig.canvas.draw()
-                axs[1].legend()
-                plt.tight_layout()
 
         C0 = np.ones(7) 
         if plot:
+            # sol = minimize(get_cost,C0,callback=plot,tol=0.001,options={"eps":0.01})
             sol = minimize(get_cost,C0,method="Powell",callback=plot)
-            for view in self.Vs:
+            for view in self.views:
+                # view.update()
                 view.plot_vehicle()
         else:
+            # sol = minimize(get_cost,C0,tol=0.00001,options={"eps":0.01})
             sol = minimize(get_cost,C0,method="Powell")
+            # sol = minimize(get_cost,C0)
         try:
             plt.pause(0.001)
-            input("<Pres any key to close>")
             plt.close(blob_fig)
         except:
             pass
@@ -160,5 +155,5 @@ class SpatialMatch:
         C = sol.x
         Q_final = Q0 * C[0:4]
         Q_final = np.array(Q_final)/np.linalg.norm(Q_final)
-        p_final = p0 * C[4:7]
-        return p_final,Q_final
+        r_final = r0 * C[4:7]
+        return r_final,Q_final

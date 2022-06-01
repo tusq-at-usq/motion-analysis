@@ -2,6 +2,7 @@
 import os
 import sys
 import pandas as pd
+import numpy as np
 
 class BlobData:
     # All blob data from file
@@ -75,3 +76,16 @@ class FrameData:
                 'size' : self.D[i]
                 }
         return out_data
+
+class Blobs2D:
+    # A set of 2D blob data from image data
+    def __init__(self,p,D):
+        self.p = p # x,y coordinates
+        self.D = D # Diamters
+        self.n = p.shape[1]
+        # Add new data if used later
+
+    def remove_blob(self,i):
+        self.p = np.delete(self.p,i,axis=1)
+        self.D = np.delete(self.D,i)
+        self.n -= 1
