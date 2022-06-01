@@ -1,6 +1,6 @@
-# USQ Motion analysis codes
+# USQ motion analysis codes
 
-A selection of Python tools used to analyse object motion, intended predominantly for analysis of experimental motion data.
+A selection of Python tools used to analyse object motion, intended predominantly for experimental motion data.
 
 ## Install
 
