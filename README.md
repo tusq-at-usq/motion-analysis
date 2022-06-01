@@ -1,14 +1,24 @@
-# Vehicle tracker codes
+# USQ Motion analysis codes
 
-A framework for tracking vehicle motion using measured data (initially blob point tracking). 
+A selection of Python tools used to analyse object motion, intended predominantly for analysis of experimental motion data.
 
-The structure of the code is shown below: 
-![alt text](info/tracker_screenshot.png?raw=true "tracker_outline")
-(*This image to be updated/improved*)
+## Install
 
-Each block shown is a separate module, and is described in further detail below.
+Clone the repository:
+'git clone https://github.com/tusq-at-usq/motion-analysis'
 
-More info to come...
+Install using pip in editable mode:
+'python3 -m pip install -e ./'
+
+Please contact Andy (andrew.lock@usq.edu.au) if you encounter any install issues.
+
+## Conents
+
+This repository contains the following Python packages
+
+* ['motiontrack'](/src/motiontrack/README.md)
+* ['blobdetect'](/src/blobdetect/README.md)
+* (more to be included)
 
 ## Dependencies 
 FilterPy: https://github.com/rlabbe/filterpy
