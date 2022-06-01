@@ -34,6 +34,7 @@ class spatial_match:
 
     def match_alg1(self,frame_dicts,Q0,XYZ0,plot=False):
         # A simple traker which solves translation and rotation simultaneously
+        # TODO: We may develop alternative spatial match algorithms in the future
 
         # Extract the blob data from the frame into 'unfiltered' lists
         X_ims_unfilt = []

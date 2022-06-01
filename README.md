@@ -17,5 +17,5 @@ TBC.
 
 ## Documentation 
 
-More detailed documentation is found in the [library README](lib/README.md)
+Further details of each main component can be found in the ['lib' README](lib/README.md)
 
