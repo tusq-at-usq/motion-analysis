@@ -21,9 +21,11 @@ This repository contains the following Python packages
 * (more to be included)
 
 ## Dependencies 
-FilterPy: https://github.com/rlabbe/filterpy
 
-TBC.
+Most dependencies are automatically installed during the install. Most are common python packages.
+
+Less common packages include:
+FilterPy: https://github.com/rlabbe/filterpy
 
 ## Documentation 
 
