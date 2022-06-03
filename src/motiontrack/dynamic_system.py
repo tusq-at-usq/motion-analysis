@@ -12,12 +12,14 @@ class SystemCont:
         # The input variables are numpy symbols and expressions.
         self.name = name
         self.x = list(x) # States
+        self.nx = len(self.x)
         self.P = list(P) # Parameters
         self.f_xuP = fx # Differential equations f(x,u,P)
         self.u = list(u)
         self.u_dict = u_dict # Input function dict {ui,fi(t)}
-        self.x0 = {}
+        self.x0 = []
         self.observables = []
+        self.nz
 
         all_vars = set([*x,*P,*u])
         # Check that variables in eqs are in X,u,P.
@@ -39,6 +41,7 @@ class SystemCont:
     def initialise(self):
         # Substitude parameters and lambdify equations
         f_xu, self.x0, self.observables = self.read_config()
+        self.nz = len(self.observables)
         f_np = []
         u = list(self.u_dict.keys())
         for f in f_xu:
