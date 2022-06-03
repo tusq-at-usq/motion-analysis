@@ -1,10 +1,5 @@
 #!/usr/bin/python3.8
-"""6DoF Unscented Kalman Filter
-
-Can be used with a vehicle class to filter results.
-The process model is drawn from vehicle.get_X with an RK4 integrator
-
-Requires the FilterPy package, which can be installed via pip (pip3 install filterpy)
+"""Unscented Kalman Filter
 
 Note that the variance of the data (R matrix) should match the variance of the error induced in the data.
 
@@ -54,10 +49,8 @@ class UKF:
 
     def initialise(self,x0,P=None,Q=None,R=None,sigmas=None):
         # Instantiate the UKF class
-        # Default is a system with 13 states. 
-        # Assumes that the initialisation is first Z, with guesses for remaining X
         if sigmas is None:
-            sigmas = MerweScaledSigmaPoints(13, alpha=.001, beta=2., kappa=0.)
+            sigmas = MerweScaledSigmaPoints(self.S.nx, alpha=.001, beta=2., kappa=0.)
 
         f = UnscentedKalmanFilter(dim_x=self.S.nx, dim_z=self.S.nz,dt=self.dt,hx=self.hx, 
                                   fx=self.fx, points=sigmas,x_mean_fn=self.x_mean_fn)
@@ -73,7 +66,7 @@ class UKF:
         if Q is None: 
             # Default process covariance matrix
             #TODO: A more precise method of Q should be used
-            Q = np.eye((13,13))*0.01  
+            Q = np.eye((self.S.nx,self.S.nx))*0.01  
 
         f.x = np.array(self.S.x0) # Initial state
         f.P = P
