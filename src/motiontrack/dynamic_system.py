@@ -17,7 +17,7 @@ class SystemCont:
         self.u = list(u)
         self.u_dict = u_dict # Input function dict {ui,fi(t)}
         self.x0 = {}
-        self.P0 = {}
+        self.observables = []
 
         all_vars = set([*x,*P,*u])
         # Check that variables in eqs are in X,u,P.
@@ -38,7 +38,7 @@ class SystemCont:
 
     def initialise(self):
         # Substitude parameters and lambdify equations
-        f_xu, self.x0 = self.read_config()
+        f_xu, self.x0, self.observables = self.read_config()
         f_np = []
         u = list(self.u_dict.keys())
         for f in f_xu:
@@ -64,7 +64,7 @@ class SystemCont:
         x_dict = {}
         P_dict = {}
         for xi in self.x:
-            x_dict[self.name_dict[xi]] = {'x0':1.}
+            x_dict[self.name_dict[xi]] = {'x0':1.,'Observable':True}
         for Pi in self.P:
             P_dict[self.name_dict[Pi]] = {'Val':1.}
         default_dict = {'Sim_name':self.name,'States':x_dict,'Parameters':P_dict}
@@ -83,8 +83,10 @@ class SystemCont:
         f_xu = self.f_xuP.subs(P_sub)
 
         x0 = []
+        observables = []
         for x in in_dict["States"].items():
             x0.append(float(x[1]['x0']))
-        return f_xu, np.array(x0)
+            if x[1]['Observable']: observables.append(self.name_dict.inv[x[0]])
+        return f_xu, np.array(x0), observables
 
 

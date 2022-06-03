@@ -3,7 +3,7 @@ import pickle
 
 from motiontrack.dynamic_system import SystemCont
 
-file = 'data/GHAME3_1'
+file = 'data/GHAME3'
 with open(file,'rb') as file:
     sys_data = pickle.load(file)
 
