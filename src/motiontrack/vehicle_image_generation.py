@@ -189,29 +189,6 @@ class View:
             aniA.save(self.name+".avi",bitrate=200,dpi=100)
         return aniA
 
-    #  def euler_to_quaternion(self,psi, theta, phi):
-        #  """Convert Euler angles to quaternions."""
-        #  # According to Zipfel Eqn. 10.12
-        #  q0 = np.cos(psi/2) * np.cos(theta/2) * np.cos(phi/2) \
-            #  + np.sin(psi/2) * np.sin(theta/2) * np.sin(phi/2)
-        #  q1 = np.cos(psi/2) * np.cos(theta/2) * np.sin(phi/2) \
-            #  - np.sin(psi/2) * np.sin(theta/2) * np.cos(phi/2)
-        #  q2 = np.cos(psi/2) * np.sin(theta/2) * np.cos(phi/2) \
-            #  + np.sin(psi/2) * np.cos(theta/2) * np.sin(phi/2)
-        #  q3 = np.sin(psi/2) * np.cos(theta/2) * np.cos(phi/2) \
-            #  - np.cos(psi/2) * np.sin(theta/2) * np.sin(phi/2)
-        #  return q0, q1, q2, q3
-
-    #  def calculate_direction_cosine_from_quaternions(self,q0, q1, q2, q3):
-        #  """Calculate directional cosine matrix from quaternions."""
-        #  T_rot = np.array([
-            #  [q0**2+q1**2-q2**2-q3**2,  2*(q1*q2+q0*q3),  2*(q1*q3-q0*q2) ],
-            #  [2*(q1*q2-q0*q3),  q0**2-q1**2+q2**2-q3**2,  2*(q2*q3+q0*q1) ],
-            #  [2*(q1*q3+q0*q2),  2*(q2*q3-q0*q1),  q0**2-q1**2-q2**2+q3**2 ]
-            #  ]) # Eqn 10.14 from Zipfel
-        #  # T_BL += 0.5* (np.eye(3,3) - T_BI.dot(T_BI.T)).dot(T_BI)
-        #  return T_rot
-
 def runFromCSV(filename,saveSwitch):
     # Process data using a CSV file (only option for now)
 
