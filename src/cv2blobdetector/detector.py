@@ -18,7 +18,7 @@ class Tracker:
 #             
 #     Example:
 #         
-#         trk = Tracker(vid='cube.mp4')
+#         trk = Tracker(vid='pathtovideo.mp4')
 #         loc = trk.locater
 #
 #         ----------The next two lines are optional--------
@@ -28,7 +28,7 @@ class Tracker:
 # 
 #         loc.locate()
 #         trk.blob_handler.convert()
-#         trk.blob_handler.export('cube_low_threshold')
+#         trk.blob_handler.export('filename')
 # 
 #         Tips:
 #            1. Most of the tweaking you will need to do is in:
@@ -75,7 +75,7 @@ class Locater:
     Object locater class
     """
     
-    def __init__(self,parent,svdModes=2,kernel=1e-2*np.ones((10,10)),
+    def __init__(self,parent,kernel=1e-2*np.ones((10,10)),
                  frame_start=None,frames_to_show=None,downscale_factor=1,render=True,background=0,
                  only_circular_blobs=False,only_convex_blobs=False,opening_kernel=np.ones((100,100)),
                  closing_kernel=np.ones((15,15))):
@@ -357,9 +357,7 @@ class Locater:
             
             #Remove any data outside of the contour internal area
             iso[roi_mask==0] = 255
-            
-            cv2.imshow('Thresholded',iso)
-            
+
             #Draw over the contour so it isn't visible
             cv2.drawContours(iso,[local_cnt],-1,255,30)
             
@@ -368,9 +366,7 @@ class Locater:
             
             #Change the blob locations into global CS
             for pt in kp:
-                
-                # if abs(cv2.pointPolygonTest(local_cnt, pt.pt, True)) < 40: continue
-                                
+                 
                 blob_x,blob_y = pt.pt
                 #But also save the floating point versions for subpixel accuracy
                 pt.pt = (x+blob_x-pad,y+blob_y-pad)
@@ -456,12 +452,12 @@ class BlobHandler:
         self.df.to_csv(f'{fname}.csv')
     
 if __name__ == '__main__':
-    trk = Tracker(vid='cube.mp4')
+    trk = Tracker(vid='pathtovideo.mp4')
     loc = trk.locater
     loc.frame_start = 31
     # trk.locater.frames_to_show = 100
     loc.locate()
     trk.blob_handler.convert()
-    trk.blob_handler.export('cube_low_threshold')
+    trk.blob_handler.export('somevideo')
 
     
