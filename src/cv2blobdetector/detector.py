@@ -213,7 +213,7 @@ class Locater:
         self.grayframe = mask.copy()
   
         #Perform thresholding operations
-        _, mask = cv2.threshold(mask,75,255,cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(mask,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
         mask = cv2.medianBlur(mask,11)
                     
         self.preprocessed_image = mask.copy()
