@@ -15,15 +15,19 @@ The final class is the BlobHandler. This takes the list of keypoints found by th
 # Example of Usage.
 
 trk = Tracker(vid='pathtovideo.mp4')
+
 loc = trk.locater
 
 ----------The next two lines are optional--------
 
 loc.frame_start = 31
+
 loc.frames_to_show = 100
 
 loc.locate()
+
 trk.blob_handler.convert()
+
 trk.blob_handler.export('filename')
 
 # Tips:
@@ -31,7 +35,9 @@ trk.blob_handler.export('filename')
 1. Most of the tweaking you will need to do is in:
 
 Locater.preprocess_filter()
+
 Locater.find_contours()
+
 Locater.detect_blobs()
 
 2. You may also find it beneficial to play around with the settings of Locater.blob_params
