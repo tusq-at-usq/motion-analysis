@@ -1,0 +1,47 @@
+System-name: default_name
+States:
+  x:
+    Min: -1.0
+    Max: 1.0
+    X0: 1.0
+  y:
+    Min: -1.0
+    Max: 1.0
+    X0: 1.0
+  z:
+    Min: -1.0
+    Max: 1.0
+    X0: 1.0
+  u:
+    Min: -1.0
+    Max: 1.0
+    X0: 1.0
+  v:
+    Min: -1.0
+    Max: 1.0
+    X0: 1.0
+  w:
+    Min: -1.0
+    Max: 1.0
+    X0: 1.0
+Parameters:
+  f2:
+    Type: Param
+    X0: 1.0
+    Min: '-'
+    Max: '-'
+  f3:
+    Type: Param
+    X0: 1.0
+    Min: '-'
+    Max: '-'
+  m:
+    Type: Param
+    X0: 1.0
+    Min: '-'
+    Max: '-'
+  f1:
+    Type: Param
+    X0: 1.0
+    Min: '-'
+    Max: '-'
