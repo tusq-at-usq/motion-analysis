@@ -16,14 +16,7 @@ Below is a description of each module
 
 ## Dynamic system
 
-Provides the estimated (nonlinear) continuous-time dynamic equations of the system, used by the Kalman filter. 
-
-Uses a `sympy` backend of Sysopt:
-https://github.com/andrewjlock/sysopt
-
-## Integrator
-
-Integrates the continuous-time dynamic equations to get the model-estimated state. 
+The Dynamic system is conatined in the separate 'dynamicsystem' package. It integrates the continuous-time dynamic equations to get the model-estimated state. 
  
 $$ \boldsymbol{x'} _k = f( \boldsymbol{x} _{k-1} ) $$
  
