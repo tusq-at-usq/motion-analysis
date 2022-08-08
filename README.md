@@ -18,6 +18,7 @@ This repository contains the following Python packages
 
 * [`motiontrack`](/src/motiontrack/README.md)
 * [`blobdetect`](/src/blobdetect/README.md)
+* [`dynamicsystem`](/src/dynamicsystem/README.md)
 * (more to be included)
 
 ## Dependencies 

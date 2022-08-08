@@ -1,25 +1,23 @@
-import numpy as np
-import pickle
-from dynamicsystem.system_class import DynamicSystem
+""" Test case for DynamicSystem class
+"""
 
-file = 'DoF3'
-with open(file,'rb') as file:
+import pickle
+
+CONFIG = 'data/test'
+FILE  = 'data/DoF3'
+
+with open(FILE,'rb') as file:
     S = pickle.load(file)
 
-S.write_default_config('test')
-S.load_config('test')
-S.add_aug_states('test')
-S.sub_params('test')
+S.write_default_config(CONFIG)
+S.load_config(CONFIG)
+S.add_aug_states(CONFIG)
+S.sub_params(CONFIG)
 S.lambdify()
-X0 = S.load_X0('test')
-X_ = S.integrate(4,0.1,X0)
-print("Integrated state:",X_)
+x_0 = S.load_x_0(CONFIG)
+x_history, t_history = S.integrate(4,x_0,dt_max=0.1)
+print("Integrated state history:", x_history)
+print("Time history: ", t_history)
 print("SUCCESS")
-
-
-
-
-
-
 
 
