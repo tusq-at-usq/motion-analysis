@@ -1,9 +1,3 @@
-from motiontrack.geometry import *
-from motiontrack.vehicle_image_generation import *
-from matplotlib import pyplot as plt
-
-from motiontrack.utils import *
-
 """ Example geometry projection
 This code shows an example of how the geometry is projected by the viewpoint.
 Care must be taken with the Euler roation of camera view angle (easy to get wrong).
@@ -23,6 +17,12 @@ The vehicle/body coordinate system is defined as
    3 (down)
 """
 
+from matplotlib import pyplot as plt
+
+from motiontrack.geometry import *
+from motiontrack.vehicle_image_generation import *
+from motiontrack.utils import *
+
 def show_camera_viewpoints():
 
     G = pyramid_gen(1)
@@ -39,15 +39,15 @@ def show_camera_viewpoints():
     for V in Vs:
         V.update()
         V.plot_vehicle()
-    plt.pause(0.1)
-    input("Press to close:")
+    plt.pause(1)
+    #  input("Press to close:")
     plt.close('all')
 
 def create_example_view_rotation():
     G = pyramid_gen(1)
     V = View(G,np.array([0.0000,0.00000,0.000000]),"example",'example',1)
 
-    angles = np.linspace(0,1.75*np.pi,100)
+    angles = np.linspace(0,1.75*np.pi,20)
 
     r1 = []
     r2 = []
@@ -58,14 +58,16 @@ def create_example_view_rotation():
         r3.append(euler_to_quaternion(1.75*np.pi,1.75*np.pi,angle))
 
     q_ar = r1+r2+r3
-    titles = ["z rotation"]*100 + ["y rotation"]*100 + ["x rotation"]*100
+    titles = ["z rotation"]*20 + ["y rotation"]*20 + ["x rotation"]*20
 
     for q,title in zip(q_ar,titles):
         G.update([0,0,0],q,0)
         V.update()
         V.plot_vehicle(title)
+    plt.close()
 
-    
-show_camera_viewpoints()
-create_example_view_rotation()
+if __name__=='__main__':
+
+    show_camera_viewpoints()
+    create_example_view_rotation()
 
