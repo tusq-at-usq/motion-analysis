@@ -9,7 +9,7 @@ import sys
 import os
 
 from motiontrack.utils import *
-from motiontrack.read_data import Blobs2D
+from motiontrack.read_data import BlobsFrame
 
 """ View generation
 DEPENDENCIES:
@@ -132,7 +132,7 @@ class View:
         Xs = np.array(Xs).flatten()
         Ys = np.array(Ys).flatten()
         Ds = np.array(Ds).flatten()
-        return Blobs2D(np.array([Xs,Ys]),Ds)
+        return BlobsFrame(np.array([Xs,Ys]),Ds)
 
     def plot_frame(self):
         # Save a frame of an animation

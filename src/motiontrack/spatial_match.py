@@ -40,9 +40,9 @@ class SpatialMatch:
         Y_ds_unfilt = []
         D_ds_unfilt = []
         for blobs in blob_data:
-            X_d = blobs.p[0]
-            Y_d = blobs.p[1]
-            D_d = blobs.D
+            X_d = blobs.points[0]
+            Y_d = blobs.points[1]
+            D_d = blobs.diameters
             X_ds_unfilt.append(X_d)
             Y_ds_unfilt.append(Y_d)
             D_ds_unfilt.append(D_d)
@@ -61,7 +61,7 @@ class SpatialMatch:
             p = np.array(p0) + view.offset 
             self.B.update(p,Q0)
             view.update()
-            p_p = getattr(view.get_2D_data(),'p')
+            p_p = getattr(view.get_2D_data(),'points')
 
             D = np.array(D_d)*view.scale # Diameters from image
             p_p = p_p * view.scale # Blob vectors from projection
@@ -99,7 +99,7 @@ class SpatialMatch:
                 self.B.update(ps,Qs)
                 view.update()
                 blobs = view.get_2D_data()
-                p_p = blobs.p
+                p_p = blobs.points
 
                 blob_map = []
                 min_norms = []
@@ -129,8 +129,8 @@ class SpatialMatch:
                     ax.clear()
                     #  ax.scatter(X_d,Y_d,s=D,facecolors='none',edgecolor='k',)
                     blobs = view.get_2D_data()
-                    p_p = blobs.p #* view.scale
-                    D_p = blobs.D *500
+                    p_p = blobs.points #* view.scale
+                    D_p = blobs.diameters *500
 
                     proj = ax.scatter(p_p[0],p_p[1],s=D_p,color='r',label='projected')
                     ax.set_aspect("equal")

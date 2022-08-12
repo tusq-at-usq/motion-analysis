@@ -32,13 +32,18 @@ class DynamicSystem:
         self.sym_dict = sym_dict
         self.name = name
 
-        self.state_dict = {k: v for k, v in self.sym_dict.items() if v in X}
-        self.param_dict = {k: v for k, v in self.sym_dict.items() if v in P}
+        self.state_dict = {k: v for k, v in self.sym_dict.items() if k in X}
+        self.param_dict = {k: v for k, v in self.sym_dict.items() if k in P}
         self.sym_dict_inv = {v: k for k, v in sym_dict.items()}
         self.state_dict_inv = {v: k for k, v in self.state_dict.items()}
         self.param_dict_inv = {v: k for k, v in self.param_dict.items()}
 
+        self.x_dict = {name:i for i,name in enumerate(self.state_dict.values())}
+
         self.f_np = []
+
+    def get_nx(self):
+        return len(self.X)
 
     def save(self, name: str):
         """
@@ -257,6 +262,8 @@ class DynamicSystem:
         Tuple[np.array, np.array]
             [TODO:description]
         """
+        if t_end == 0:
+            return np.array([x_0]), np.array(0)
         steps = int(np.ceil(t_end/dt_max))
         dt = t_end/steps
         x = x_0

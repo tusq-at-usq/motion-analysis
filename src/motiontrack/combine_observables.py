@@ -1,13 +1,13 @@
 """ Observation and measurment functions
 """
 
-from typing import List, Tuple
+from typing import List, Tuple, Callable
 import numpy as np
 
 from motiontrack.custom_types import ObservationGroup
 
-def get_all_measurements(obs: List[ObservationGroup], x_pr_dict: dict)\
-        -> Tuple(np.array, np.array):
+def get_all_measurements(obs: List[ObservationGroup], x_pr: np.array, x_dict: dict)\
+        -> Tuple[np.array, np.array]:
     """
     Get measurements from multiple groups
 
@@ -18,51 +18,57 @@ def get_all_measurements(obs: List[ObservationGroup], x_pr_dict: dict)\
     ----------
     obs : List[ObservationGroup]
         List of observation groups
-    x_pr_dict : dict
-        A priori state estimate used to assist with measurements (such as image tracking)
+    x_pr : np.array
+        State vector`
+    x_dict : dict
+        Dictionary of state vector in format {<name> : <index>}
 
     Returns
     -------
     y : np.array
         Array of measurement values
-    tau : np.array
-        Array of observation uncertanties
+    R : np.array
+        Matrix of observation uncertanties
     """
     y_all = np.empty(0)
     tau_all = np.empty(0)
     for ob in obs:
-        _, y, tau = ob.next_measurement(x_pr_dict)
+        y, tau = ob.next_measurement(x_pr, x_dict)
         y_all = np.concatenate([y_all,y])
         tau_all = np.concatenate([tau_all,tau])
-    return y_all, tau_all
+        R = np.eye(len(tau_all))*tau_all
+    return y_all, R
 
-def get_all_observables(obs: List[ObservationGroup], x_dict: dict)\
+def create_observable_function(obs: List[ObservationGroup], x_dict: dict)\
         -> np.array:
     """
-    Calculate observables
+    Create combined observabel function
 
-    Calculates observable values from state vector for all observable groups
+    Creates a combined observanle function from all observable groups
+    for the next update time.
 
     Parameters
     ----------
     obs : List[ObservationGroup]
         List of ObservationGroup instances to use for observation
     x_dict : dict
-        Dictionary of state vector in form {<name>:value}
+        Dictionary of states in state vector, in form {<name>:index}
 
     Returns
     -------
-    z : np.array
-        Array of observation values
+    hx : Callable
+        Combined observable function
     """
-    z_all = np.empty(0)
-    for ob in obs:
-        z = ob.calc_observable(x_dict)
-        z_all = np.concatenate([z_all,z])
-    return z_all
+    hx_groups = [ob.create_ob_fn(x_dict) for ob in obs]
+
+    def hx(x: np.array):
+        z = [hx_i(x) for hx_i in hx_groups]
+        z = np.array(np.concatenate(z).flat)
+        return z
+    return hx
 
 def get_next_obs_group(obs_all: List[ObservationGroup], t: float, dt_min: float)\
-        -> Tuple[List[ObservationGroup],float]:
+        -> Tuple[float, List[ObservationGroup], int]:
     """
     Get sub-group of observations at next observation time
 
@@ -83,13 +89,19 @@ def get_next_obs_group(obs_all: List[ObservationGroup], t: float, dt_min: float)
     -------
     obs_next : List[ObservationGroup]
         List of observation groups relevant to the next measurement time
-    t_next : Time of the next measurement
+    t_next : float 
+        Time of the next measurement
+    nz : int
+        Number of observables
     """
     ts = []
     for ob in obs_all:
-        t.append(ob.get_next_t())
-    t_min = np.min(t)
+        ts.append(ob.get_next_t())
+    t_min = np.min(ts)
+    if t_min == np.Inf:
+        return np.Inf, [], 0
     obs_next = [obs_all[i] for i in range(len(obs_all)) if ts[i]-t_min<dt_min]
-    return obs_next
+    nz = np.sum([ob.get_nz() for ob in obs_next])
+    return t_min, obs_next, nz
 
 

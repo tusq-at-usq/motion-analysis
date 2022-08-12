@@ -15,7 +15,7 @@ class BlobsFrame:
     def __init__(self, points: np.array, diameters: np.array):
         self.points = points # x,y coordinates
         self.diameters = diameters # Diameters
-        self.n_blobs = points.shape[1]
+        self.n = points.shape[1]
 
     def remove_blob(self, i: int):
         """
@@ -28,7 +28,7 @@ class BlobsFrame:
         """
         self.points = np.delete(self.points, i, axis=1)
         self.diameters = np.delete(self.diameters, i)
-        self.n_blobs -= 1
+        self.n -= 1
 
     def plot_frame(self):
         """

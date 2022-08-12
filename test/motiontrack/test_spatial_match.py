@@ -24,7 +24,7 @@ from motiontrack.spatial_match import *
 from motiontrack.geometry import *
 from motiontrack.vehicle_image_generation import *
 from motiontrack.utils import *
-from motiontrack.read_data import Blobs2D
+from motiontrack.read_data import BlobsFrame
 
 # Create cube body with pre-determined blob locations
 B = cubeGen(1,'data/blob_XYs.npy')
@@ -53,8 +53,8 @@ Q_est = euler_to_quaternion(*EA_est)
 Q_est = Q_est / np.linalg.norm(Q_est) # Normalise quaternions
 
 # Add gaussian error to X and Y blob data (to approximate imperfect measured data)
-blobs_er_t = Blobs2D(blobs_t.p + np.random.normal(scale=0.01,size=blobs_t.n),blobs_t.D)
-blobs_er_w = Blobs2D(blobs_w.p + np.random.normal(scale=0.01,size=blobs_w.n),blobs_w.D)
+blobs_er_t = BlobsFrame(blobs_t.points + np.random.normal(scale=0.01,size=blobs_t.n),blobs_t.diameters)
+blobs_er_w = BlobsFrame(blobs_w.points + np.random.normal(scale=0.01,size=blobs_w.n),blobs_w.diameters)
 
 # Remove two random blobs from each view (to simulate imcomplete data)
 n1 = np.random.randint(0,blobs_t.n-1)

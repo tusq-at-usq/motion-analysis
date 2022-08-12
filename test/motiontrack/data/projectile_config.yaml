@@ -1,38 +1,38 @@
 System-name: default_name
 States:
   x:
-    Min: -1.0
-    Max: 1.0
-    X0: 1.0
+    Min: 0.0
+    Max: 100.0
+    X0: 0.0
   y:
-    Min: -1.0
-    Max: 1.0
-    X0: 1.0
+    Min: 0.0
+    Max: 100.0
+    X0: 0.0
   z:
-    Min: -1.0
-    Max: 1.0
-    X0: 1.0
+    Min: 0.0
+    Max: 100.0
+    X0: 0.0
   u:
-    Min: -1.0
-    Max: 1.0
-    X0: 1.0
+    Min: 0.0
+    Max: 20.0
+    X0: 20.0
   v:
-    Min: -1.0
-    Max: 1.0
-    X0: 1.0
+    Min: 0.0
+    Max: 30.0
+    X0: 30.0
   w:
-    Min: -1.0
-    Max: 1.0
-    X0: 1.0
+    Min: 0.0
+    Max: 25.0
+    X0: 25.0
 Parameters:
   cross-wind:
     Type: Param
-    X0: 1.0
+    X0: 10.0
     Min: '-'
     Max: '-'
   air_density:
     Type: Param
-    X0: 1.0
+    X0: 1.225
     Min: '-'
     Max: '-'
   area:
@@ -42,7 +42,7 @@ Parameters:
     Max: '-'
   mass:
     Type: Param
-    X0: 1.0
+    X0: 10.0
     Min: '-'
     Max: '-'
   drag_coef:
