@@ -330,7 +330,7 @@ def cubeGen(L,blob_location_filename=None):
             print("Saved new blob locations as 'blob_XYs.npy'")
     else:
         blob_coords = np.load(blob_location_filename)
-        print("Loaded blob locations from:",blob_location_filename)
+        #  print("Loaded blob locations from:",blob_location_filename)
 
     for surf,coord in zip(surfs,blob_coords):
         blobXs = coord[0]

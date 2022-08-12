@@ -151,9 +151,9 @@ class SpatialMatch:
         else:
             sol = minimize(get_cost,C0,method="Powell")
         try:
-            plt.pause(0.001)
-            input("<Pres any key to close>")
-            plt.close(blob_fig)
+            plt.pause(1)
+            #  input("<Pres any key to close>")
+            #  plt.close(blob_fig)
         except:
             pass
 
