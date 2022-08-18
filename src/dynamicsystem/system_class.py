@@ -29,6 +29,7 @@ class DynamicSystem:
         self.P = list(P)
         self.f = list(f)
         self.U = []
+        self.J = self._create_jacobian_fn()
         self.sym_dict = sym_dict
         self.name = name
 
@@ -197,6 +198,7 @@ class DynamicSystem:
         """
         for f in self.f:
             self.f_np.append(sp.lambdify([self.X, self.U], f,'numpy'))
+        self.J_np = sp.lambdify([self.X, self.U], self.J,'numpy')
 
     def get_x_dot(self, x: np.array, u: np.array=np.array([])):
         """
@@ -233,6 +235,10 @@ class DynamicSystem:
         k4 = self.get_x_dot(x+dt*k3, u)
         x_ = x + (dt/6)*(k1 + 2*k2 + 2*k3 + k4)
         return x_
+
+    def _create_jacobian(self):
+        J = sp.Matrix(self.f).jacobian(self.X+self.U)
+        return J
 
     def integrate(self,
                   t_end: float,
