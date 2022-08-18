@@ -29,7 +29,7 @@ class DynamicSystem:
         self.P = list(P)
         self.f = list(f)
         self.U = []
-        self.J = self._create_jacobian_fn()
+        self.J = self._create_jacobian()
         self.sym_dict = sym_dict
         self.name = name
 
