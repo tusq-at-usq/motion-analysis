@@ -29,7 +29,6 @@ class DynamicSystem:
         self.P = list(P)
         self.f = list(f)
         self.U = []
-        self.J = self._create_jacobian()
         self.sym_dict = sym_dict
         self.name = name
 
@@ -187,6 +186,9 @@ class DynamicSystem:
         for i in range(len(self.f)):
             self.f[i] = self.f[i].subs(param_subs)
         return
+
+    def create_jacobian(self):
+        self.J = self._create_jacobian()
 
     def lambdify(self):
         """

@@ -14,11 +14,14 @@ with open(FILE,'rb') as file:
 dsys.load_config(CONFIG)
 dsys.add_aug_states(CONFIG)
 dsys.sub_params(CONFIG)
+dsys.J = dsys._create_jacobian()
 dsys.lambdify()
+
 x_0 = dsys.load_x_0(CONFIG)
 x_history, t_history = dsys.integrate(2.8,x_0,dt_max=0.1)
 print("Integrated state history:", x_history)
 print("Time history: ", t_history)
+
 
 ax = plt.axes(projection='3d')
 ax.plot(x_history[:,0], x_history[:,1], x_history[:,2],color='k')

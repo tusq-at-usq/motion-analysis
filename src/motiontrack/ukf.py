@@ -182,7 +182,7 @@ def custom_process_noise(A: np.array,
     Parameters
     ----------
     A : np.array
-        Linear system tranition matrix (can be an estimate)
+        Linear dynamical system matrix (can be an estimate)
     Q_c : np.array
         Continuous-time process noise matrix (normally sparse)
     dt_ : float
@@ -199,7 +199,7 @@ def custom_process_noise(A: np.array,
     def _eval(ts):
         res = []
         for t in ts:
-            res.append(expm(A*t)@Q_c@expm(A*t).T)
+            res.append(expm(A*t)@(Q_c*density)@expm(A*t).T)
         return np.moveaxis(res, 0, 2)
 
     Q_d, err = quadpy.quad(_eval, 0, dt)
