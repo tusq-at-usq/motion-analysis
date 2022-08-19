@@ -1,0 +1,52 @@
+System-name: default_name
+States:
+  x:
+    Min: 0.0
+    Max: 100.0
+    X0: 0.0
+  y:
+    Min: 0.0
+    Max: 100.0
+    X0: 0.0
+  z:
+    Min: 0.0
+    Max: 100.0
+    X0: 0.0
+  u:
+    Min: 0.0
+    Max: 20.0
+    X0: 20.0
+  v:
+    Min: 0.0
+    Max: 30.0
+    X0: 30.0
+  w:
+    Min: 0.0
+    Max: 25.0
+    X0: 25.0
+Parameters:
+  cross-wind:
+    Type: Param
+    X0: 14.0
+    Min: '-'
+    Max: '-'
+  air_density:
+    Type: Param
+    X0: 1.0
+    Min: '-'
+    Max: '-'
+  area:
+    Type: Param
+    X0: 1.0
+    Min: '-'
+    Max: '-'
+  mass:
+    Type: Param
+    X0: 13.0
+    Min: '-'
+    Max: '-'
+  drag_coef:
+    Type: Param
+    X0: 0.7
+    Min: '-'
+    Max: '-'
