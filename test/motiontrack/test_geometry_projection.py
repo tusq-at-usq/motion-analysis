@@ -4,8 +4,8 @@ Care must be taken with the Euler roation of camera view angle (easy to get wron
 The object is rotated about the BODY (not local) coordinate axis.
 The order of rotation (positive RHR direction: Z, Y, X body axis).
 
-Below is an examaple of the camera set up for different viewpoints, 
-as well as a brief animation showing three consecutive rotations. 
+Below is an examaple of the camera set up for different viewpoints,
+as well as a brief animation showing three consecutive rotations.
 
 The vehicle/body coordinate system is defined as
 
@@ -33,9 +33,9 @@ def show_camera_viewpoints():
     V_t = View(G,np.array([0.0000,0.0000,0.000000]),"top",'test',0)
     V_w = View(G,np.array([np.pi/2,np.pi/2,0.0]),"west",'test',0)
     V_e = View(G,np.array([-np.pi/2,np.pi/2,0.0]),"east",'test',0)
-    
+   
     Vs = [V_b,V_r,V_f,V_t,V_w,V_e]
-        
+       
     for V in Vs:
         V.update()
         V.plot_vehicle()

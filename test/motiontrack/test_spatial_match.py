@@ -29,7 +29,7 @@ from motiontrack.read_data import BlobsFrame
 def test_spatial_match(print_flag=0):
 
     # Create cube body with pre-determined blob locations
-    B = cubeGen(1,'data/blob_XYs.npy')
+    B = cube_gen(1,'data/blob_XYs.npy')
 
     V_t = View(B,np.array([0.,0.,0.]),'top') # View from top
     V_w = View(B,np.array([np.pi/2,np.pi/2,0.]),'west') # View from west

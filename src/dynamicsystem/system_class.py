@@ -185,6 +185,7 @@ class DynamicSystem:
         self.U = [self.sym_dict_inv[ui] for ui in inputs]
         for i in range(len(self.f)):
             self.f[i] = self.f[i].subs(param_subs)
+        self.J = self._create_jacobian()
         return
 
     def create_jacobian(self):

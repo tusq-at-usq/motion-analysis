@@ -284,7 +284,7 @@ def pyramid_gen(L,blob_location_filename=None):
     B.blobSize = L/10
     return B
 
-def cubeGen(L,blob_location_filename=None):
+def cube_gen(L,blob_location_filename=None):
     # An example cube vehicle shape
     p0 = Point([0,0,0])
     p1 = Point([0,1,0])

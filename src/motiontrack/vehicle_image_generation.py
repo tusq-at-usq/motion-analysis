@@ -211,7 +211,7 @@ def runFromCSV(filename,saveSwitch):
     scale = np.max(np.abs(np.array([Xs,Ys,Zs])))
     L = scale/5
 
-    B = cubeGen(12)
+    B = cube_gen(12)
     B.L = L
 
     # The default view angle is looking from above
