@@ -30,3 +30,18 @@ Most dependencies should be automatically installed during the package install
 
 Documentation to be added to [`docs`](/docs/)
 
+## [`Tests`](/tests)
+
+A collection of tests used when modifying packages
+
+## [`Exampels`](/tests)
+
+Examples of how the different packages integrate to track dynamic systems.
+Includes
+
+- 3DoF tracking from XYZ data
+- 6DoF tracking from XYZ and quaternion data
+- more to be included...
+
+
+
