@@ -27,7 +27,7 @@ States:
 Parameters:
   cross-wind:
     Type: Param
-    X0: 20.0
+    X0: 0.0
     Min: '-'
     Max: '-'
   air_density:

@@ -67,6 +67,23 @@ def create_observable_function(obs: List[ObservationGroup], x_dict: dict)\
         return z
     return hx
 
+def create_residual_function(obs: List[ObservationGroup]):
+    """ Combine the observation residual functions of each group
+    """
+
+    def residual_fn(y1, y0):
+        nz_count = 0
+        residual = []
+        for ob in obs:
+            nz = ob.get_nz()
+            residual.append(ob.residual(y1[nz_count:nz_count+nz],
+                                        y0[nz_count:nz_count+nz]))
+        nz_count += nz
+        return np.array(residual)
+    return residual_fn
+
+
+
 def get_next_obs_group(obs_all: List[ObservationGroup], t: float, dt_min: float)\
         -> Tuple[float, List[ObservationGroup], int]:
     """

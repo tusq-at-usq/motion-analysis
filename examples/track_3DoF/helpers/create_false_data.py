@@ -16,8 +16,10 @@ dsys.lambdify()
 x_0 = dsys.load_x_0(CONFIG)
 x_history, t_history = dsys.integrate(3.6,x_0,dt_max=0.1)
 
-error1 = np.random.normal(0,1,[len(t_history),2])
-error2 = np.random.normal(0,1,[len(t_history),2])
+e_mag = 3
+
+error1 = np.random.normal(0,e_mag,[len(t_history),2])
+error2 = np.random.normal(0,e_mag,[len(t_history),2])
 
 np.savetxt("../data/view1.csv", x_history[:,[0,2]]+error1, delimiter=",")
 np.savetxt("../data/view2.csv", x_history[:,[1,2]]+error2, delimiter=",")

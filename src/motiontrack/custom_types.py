@@ -114,6 +114,12 @@ class ObservationGroup:
         hx = self._create_ob_fn(x_dict)
         return hx
 
+    def residual(self,y1,y0):
+        """ Placeholder for residual calculation.
+            Overide if using quaternions
+            """
+        return y1-y0
+
     def get_tau(self):
         """ Return measurement uncertainty """
         return self.tau_history[-1]

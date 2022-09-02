@@ -17,11 +17,11 @@ dsys.sub_params(CONFIG)
 dsys.J = dsys._create_jacobian()
 dsys.lambdify()
 x_0 = dsys.load_x_0(CONFIG)
-x_history_1, t_history_1 = dsys.integrate(2.5,x_0,dt_max=0.1)
-x_history_2, t_history_2 = dsys.integrate(2.5,x_0,dt_max=0.15)
+x_history_1, t_history_1 = dsys.integrate(2.5,x_0,dt_max=0.02)
+x_history_2, t_history_2 = dsys.integrate(2.5,x_0,dt_max=0.05)
 
-POS_E_SCALE = 0.3
-Q_E_SCALE = 0.1
+POS_E_SCALE = 0.5
+Q_E_SCALE = 0.2
 
 error1 = np.concatenate([np.random.normal(0,POS_E_SCALE,[len(t_history_1),2]),
                         np.random.normal(0,Q_E_SCALE,[len(t_history_1),4])], axis=1)
@@ -33,9 +33,9 @@ x_data_error_2 = x_history_2[:,[1,2,3,4,5,6]]+error2
 
 # Extra step to normalise the quaternions after error
 for i,_ in enumerate(t_history_1):
-    x_data_error_1[i,3:7] = x_data_error_1[i,3:7]/np.linalg.norm(x_data_error_1[i,3:7])
+    x_data_error_1[i,2:6] = x_data_error_1[i,2:6]/np.linalg.norm(x_data_error_1[i,2:6])
 for i,_ in enumerate(t_history_2):
-    x_data_error_2[i,3:7] = x_data_error_2[i,3:7]/np.linalg.norm(x_data_error_2[i,3:7])
+    x_data_error_2[i,2:6] = x_data_error_2[i,2:6]/np.linalg.norm(x_data_error_2[i,2:6])
 
 np.savetxt("../data/view1_2ob.csv", x_data_error_1, delimiter=",")
 np.savetxt("../data/view2_2ob.csv", x_data_error_2, delimiter=",")

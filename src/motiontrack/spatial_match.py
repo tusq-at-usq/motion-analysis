@@ -16,7 +16,6 @@ from getopt import getopt
 from matplotlib import pyplot as plt
 
 from motiontrack.utils import *
-from motiontrack.read_data import *
 
 class SpatialMatch:
     def __init__(self,B,Vs):
@@ -24,14 +23,20 @@ class SpatialMatch:
         self.Vs = Vs
         self.n_V = len(Vs)
 
-    def run_match(self,blob_data,p_est,Q_est,plot=0):
+    def run_match(self,
+                  blob_data,
+                  p_est,
+                  Q_est,
+                  plot_match=0,
+                  plot_orientation=0):
         if len(blob_data) != self.n_V:
             print("ERROR: number of blob frames does not match viewpoints")
             raise ValueError
-        p,Q = self.match_alg1(blob_data,p_est,Q_est,plot)
+        p, Q = self.match_alg1(blob_data, p_est, Q_est, plot_match, plot_orientation)
+        plt.close()
         return p,Q
 
-    def match_alg1(self,blob_data,p0,Q0,plot_flag=False):
+    def match_alg1(self,blob_data,p0,Q0,plot_match=False, plot_orientation=False):
         # A simple traker which solves translation and rotation simultaneously
         # TODO: We may develop alternative spatial match algorithms in the future
 
@@ -121,7 +126,7 @@ class SpatialMatch:
                 error = error + error_
             return error
 
-        if plot_flag:
+        if plot_match:
             blob_fig,axs = plt.subplots(1,2)
             axs.flatten()
             def plot(X):
@@ -144,16 +149,17 @@ class SpatialMatch:
                 plt.tight_layout()
 
         C0 = np.ones(7) 
-        if plot:
+        if plot_match:
             sol = minimize(get_cost,C0,method="Powell",callback=plot)
+        else:
+            sol = minimize(get_cost,C0,method="Powell",callback=plot)
+        if plot_orientation:
             for view in self.Vs:
                 view.plot_vehicle()
-        else:
-            sol = minimize(get_cost,C0,method="Powell")
         try:
             plt.pause(1)
             #  input("<Pres any key to close>")
-            #  plt.close(blob_fig)
+            plt.close(blob_fig)
         except:
             pass
 

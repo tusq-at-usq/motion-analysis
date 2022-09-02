@@ -4,9 +4,11 @@
 from typing import List
 import numpy as np
 from motiontrack.custom_types import ObservationGroup
+import motiontrack.quaternion_operations as QO
 
 class Pos2DandQ(ObservationGroup):
-    """ 2-dimensional position observations using CSV file data for testing
+    """ 2-dimension position and quaternion rotation observations using CSV
+    file data, for testing
     """
     def __init__(self, name: str,
                  ob_names: List[str],
@@ -25,7 +27,7 @@ class Pos2DandQ(ObservationGroup):
         index_next = np.argmax(self.time>t_current)
         t_next = self.time[index_next]
         y_next = self.data[index_next,:]
-        tau_next = np.array([2, 2, 0.1, 0.1, 0.1, 0.1])
+        tau_next = np.array([0.5, 0.5, 0.2, 0.2, 0.2, 0.2])
         return t_next, y_next, tau_next
 
     def _get_next_t(self):
@@ -40,4 +42,15 @@ class Pos2DandQ(ObservationGroup):
             z = np.array([x[x_dict[name]] for name in self.ob_names])
             return z
         return hx
+
+    def residual(self, y1, y0):
+    # Custom function to take the difference of observables
+    # (Quaternions cannot be subtracted linearly)
+        q0 = y0[2:6]
+        q1 = y1[2:6]
+        q_diff = QO.subtract(q1,q0)
+        y_diff = y1-y0
+        y_diff[2:6] = q_diff
+        breakpoint()
+        return y_diff
 

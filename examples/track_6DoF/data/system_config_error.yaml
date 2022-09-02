@@ -60,7 +60,7 @@ Parameters:
     Max: '-'
   mass:
     Type: Param
-    X0: 14.0
+    X0: 12.0
     Min: '-'
     Max: '-'
   area:
@@ -95,6 +95,6 @@ Parameters:
     Max: '-'
   cross-wind:
     Type: Param
-    X0: 10.0
+    X0: 8.0
     Min: '-'
     Max: '-'
