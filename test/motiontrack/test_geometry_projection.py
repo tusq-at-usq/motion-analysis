@@ -20,7 +20,7 @@ The vehicle/body coordinate system is defined as
 from matplotlib import pyplot as plt
 
 from motiontrack.geometry import *
-from motiontrack.vehicle_image_generation import *
+from motiontrack.body_projection import *
 from motiontrack.utils import *
 
 def show_camera_viewpoints():
@@ -47,7 +47,7 @@ def create_example_view_rotation():
     G = pyramid_gen(1)
     V = View(G,np.array([0.0000,0.00000,0.000000]),"example",'example',1)
 
-    angles = np.linspace(0,1.75*np.pi,20)
+    angles = np.linspace(0,0.25*np.pi,5)
 
     r1 = []
     r2 = []

@@ -1,5 +1,4 @@
-
-col0:ImageIndex[-] col1:regionIndx[-] col2:xCord[px] col3:yCord[px] col4:size[px2] col5:angle[rad]
+col0:FrameIndex[-] col1:regionIndx[-] col2:x_cord[px] col3:y_cord[px] col4:Size[px2] col5:angle[rad]
 2 0 497.0000000000 1121.0000000000 12.6491107941 -1.0000000000 
 2 0 515.2843017578 1111.8653564453 13.0376615524 -1.0000000000 
 2 0 383.1138305664 1046.0446777344 12.5332612991 -1.0000000000 

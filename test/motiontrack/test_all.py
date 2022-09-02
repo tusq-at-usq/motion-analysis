@@ -3,7 +3,7 @@
 
 from test_read_file import test_read_file
 test_read_file()
-print("Test module: 'read_data.py' :".ljust(60)+"SUCCESS")
+print("Test module: 'blob_data.py' :".ljust(60)+"SUCCESS")
 
 from test_combine_observables import test_combine_observables
 test_combine_observables()

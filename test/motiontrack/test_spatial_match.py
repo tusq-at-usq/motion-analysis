@@ -22,9 +22,9 @@ import numpy as np
 
 from motiontrack.spatial_match import *
 from motiontrack.geometry import *
-from motiontrack.vehicle_image_generation import *
+from motiontrack.body_projection import *
 from motiontrack.utils import *
-from motiontrack.read_data import BlobsFrame
+from motiontrack.blob_data import BlobsFrame
 
 def test_spatial_match(print_flag=0):
 
