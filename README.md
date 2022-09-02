@@ -12,21 +12,19 @@ Install using pip in editable mode:
 
 Please contact Andy (andrew.lock@usq.edu.au) if you encounter any install issues.
 
-## Conents
+## Contents
 
 This repository contains the following Python packages
 
 * [`motiontrack`](/src/motiontrack/README.md)
 * [`blobdetect`](/src/blobdetect/README.md)
 * [`dynamicsystem`](/src/dynamicsystem/README.md)
+* [`kalmanfilter`](/src/kalmanfilter/README.md)
 * (more to be included)
 
 ## Dependencies 
 
-Most dependencies are automatically installed during the install. Most are common python packages.
-
-Less common packages include:
-FilterPy: https://github.com/rlabbe/filterpy
+Most dependencies should be automatically installed during the package install
 
 ## Documentation 
 
