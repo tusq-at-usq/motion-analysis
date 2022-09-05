@@ -30,11 +30,11 @@ Most dependencies should be automatically installed during the package install
 
 Documentation to be added to [`docs`](/docs/)
 
-## [`Tests`](/tests)
+## Tests
 
-A collection of tests used when modifying packages
+Tests the functionality of individual functions, for use when modifying packages
 
-## [`Exampels`](/tests)
+## Examples
 
 Examples of how the different packages integrate to track dynamic systems.
 Includes
