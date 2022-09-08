@@ -8,7 +8,7 @@ using blob location from data, and a model of the object.
 Author: Andrew Lock
 Created: 30/5/22
 """
-
+import time
 import numpy as np
 from scipy import stats
 from scipy.optimize import minimize
@@ -27,42 +27,40 @@ class SpatialMatch:
                   blob_data,
                   p_est,
                   Q_est,
-                  plot_match=0,
-                  plot_orientation=0):
+                  plots = []):
         if len(blob_data) != self.n_V:
             print("ERROR: number of blob frames does not match viewpoints")
             raise ValueError
-        p, Q = self.match_alg1(blob_data, p_est, Q_est, plot_match, plot_orientation)
+        p, Q = self.match_alg1(blob_data, p_est, Q_est, plots)
         plt.close()
         return p,Q
 
-    def to_vectors(self, blob_data):
-        for blobs in blob_data:
-            X_d = blobs.points[0]
-            Y_d = blobs.points[1]
-            D_d = blobs.diameters
-            X_ds_unfilt.append(X_d)
-            Y_ds_unfilt.append(Y_d)
-            D_ds_unfilt.append(D_d)
+    #  def to_vectors(self, blob_data):
+        #  for blobs in blob_data:
+            #  X_d = blobs.points[0]
+            #  Y_d = blobs.points[1]
+            #  D_d = blobs.diameters
+            #  X_ds_unfilt.append(X_d)
+            #  Y_ds_unfilt.append(Y_d)
+            #  D_ds_unfilt.append(D_d)
 
-
-    def match_alg1(self,blob_data,p0,Q0,plot_match=False, plot_orientation=False):
+    def match_alg1(self,blob_data, p0, Q0, plots):
         # A simple traker which solves translation and rotation simultaneously
-        # TODO: We may develop alternative spatial match algorithms in the future
+        # TODO: We NEED to develop better spatial match algorithms in the future
 
         # Extract the blob data from the  into 'unfiltered' lists
         X_ds_unfilt = []
         Y_ds_unfilt = []
         D_ds_unfilt = []
         for blobs in blob_data:
-            X_d = blobs.points[0]
-            Y_d = blobs.points[1]
+            X_d = blobs.points[:,0]
+            Y_d = blobs.points[:,1]
             D_d = blobs.diameters
             X_ds_unfilt.append(X_d)
             Y_ds_unfilt.append(Y_d)
             D_ds_unfilt.append(D_d)
 
-        # Filtering step - use a subselection of data blobs 
+        # Filtering step - use a subselection of data blobs
         # TODO: This step could probably be improved for robustness
         # TODO: Improve notation with 2D position vectors
         X_ds=[]; Y_ds=[]; D_ds=[]
@@ -75,8 +73,8 @@ class SpatialMatch:
             # Update model and views
             p = np.array(p0) + view.offset 
             self.B.update(p,Q0)
-            view.update()
-            p_p = getattr(view.get_2D_data(),'points')
+            view.update_blobs()
+            p_p = getattr(view.get_2D_data(),'points').T
 
             D = np.array(D_d)*view.scale # Diameters from image
             p_p = p_p * view.scale # Blob vectors from projection
@@ -97,12 +95,10 @@ class SpatialMatch:
             D_ds.append([D_d[i] for i in pairs])
 
         def get_cost(C):
-            #TODO: Check this is the appropriate normalisation of quaternions. 
-            # For a unit quaternion, should it just be the q1,q2,q3 which are normalised?
             Qs = Q0 * C[0:4]
             Qs = np.array(Qs)/np.linalg.norm(Qs)
             error = 0
-            #  for view,X_d,Y_d,D_d,offset in zip(self.views,X_ds,Y_ds,D_ds,self.offsets):
+
             for i in range(self.n_V):
                 view = self.Vs[i]
                 X_d = X_ds[i]
@@ -112,7 +108,7 @@ class SpatialMatch:
                 ps = p0 * C[4:7]
                 ps = ps + view.offset
                 self.B.update(ps,Qs)
-                view.update()
+                view.update_blobs()
                 blobs = view.get_2D_data()
                 p_p = blobs.points
 
@@ -125,53 +121,50 @@ class SpatialMatch:
                     # an arbitrary blob.
                     if len(p_p) > 0:
                         p_d = np.array([x,y])
-                        delta_r = p_p.T - p_d
+                        delta_r = p_p - p_d
                         norms = np.linalg.norm(delta_r,axis=1) # Distance image blob and projected blobs
                         blob_map.append(np.argmin(norms))
                         j = np.argmin(norms)
-                        p_p = np.delete(p_p,j,axis=1) # Option: only allow each dot to be used once
+                        p_p = np.delete(p_p.T,j,axis=1).T # Option: only allow each dot to be used once
                         min_norms.append(np.min(norms)**2) 
                         # OPTIONAL: Weight by surface norm
                 error_ = np.mean(min_norms[0:np.min((blobs.n,blobs.n))])
                 error = error + error_
             return error
 
-        if plot_match:
-            blob_fig,axs = plt.subplots(1,2)
-            axs.flatten()
-            def plot(X):
-                for view,ax,X_d,Y_d,D_d in zip(self.Vs,axs,X_ds,Y_ds,D_ds):
-                    ax.clear()
-                    #  ax.scatter(X_d,Y_d,s=D,facecolors='none',edgecolor='k',)
-                    blobs = view.get_2D_data()
-                    p_p = blobs.points #* view.scale
-                    D_p = blobs.diameters *500
+        def callback_plot(X):
+            for view, X_d, Y_d, plot in zip(self.Vs, X_ds, Y_ds, plots):
+                blobs_p = view.get_2D_data()
+                p_i = np.array([X_d, Y_d])
+                plot.update_observation(p_i)
+                plot.update_projection(blobs_p)
+                time.sleep(0.01)
 
-                    proj = ax.scatter(p_p[0],p_p[1],s=D_p,color='r',label='projected')
-                    ax.set_aspect("equal")
-                    ax.set_title(view.name)
+        #  if plot_match:
+            #  blob_fig,axs = plt.subplots(1,2)
+            #  axs.flatten()
+            #  def plot(X):
+                #  for view,ax,X_d,Y_d,D_d in zip(self.Vs,axs,X_ds,Y_ds,D_ds):
+                    #  ax.clear()
+                    #  #  ax.scatter(X_d,Y_d,s=D,facecolors='none',edgecolor='k',)
+                    #  blobs = view.get_2D_data()
+                    #  p_p = blobs.points #* view.scale
+                    #  D_p = blobs.diameters *500
 
-                    D_d = np.array(D_d)*view.scale*800
-                    data = ax.scatter(X_d,Y_d,s=D_d,facecolors='none',edgecolor='k',label='data')
-                plt.pause(0.01)
-                blob_fig.canvas.draw()
-                axs[1].legend()
-                plt.tight_layout()
+                    #  proj = ax.scatter(p_p[0],p_p[1],s=D_p,color='r',label='projected')
+                    #  ax.set_aspect("equal")
+                    #  ax.set_title(view.name)
+
+                    #  D_d = np.array(D_d)*view.scale*800
+                    #  data = ax.scatter(X_d,Y_d,s=D_d,facecolors='none',edgecolor='k',label='data')
+                #  plt.pause(0.01)
+                #  blob_fig.canvas.draw()
+                #  axs[1].legend()
+                #  plt.tight_layout()
 
         C0 = np.ones(7) 
-        if plot_match:
-            sol = minimize(get_cost,C0,method="Powell",callback=plot)
-        else:
-            sol = minimize(get_cost,C0,method="Powell")
-        if plot_orientation:
-            for view in self.Vs:
-                view.plot_vehicle()
-        try:
-            plt.pause(1)
-            #  input("<Pres any key to close>")
-            plt.close(blob_fig)
-        except:
-            pass
+        sol = minimize(get_cost,C0,method="Powell",callback=callback_plot)
+        #  sol = minimize(get_cost,C0,method="Powell")
 
         C = sol.x
         Q_final = Q0 * C[0:4]

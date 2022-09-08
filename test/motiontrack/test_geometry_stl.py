@@ -28,7 +28,7 @@ def load_stl(STL_NAME):
     Q2 = np.linspace(0,0.5,100)
     Q3 = np.linspace(0,1,100)
     Q1 = np.linspace(0,np.pi/2,100)
- 
+
     X1 = np.linspace(0,50,100)
 
     V = View(body,np.array([-np.pi/2,0.0,0.0]),"top",'test',0)
