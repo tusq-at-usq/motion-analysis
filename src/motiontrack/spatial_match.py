@@ -36,6 +36,16 @@ class SpatialMatch:
         plt.close()
         return p,Q
 
+    def to_vectors(self, blob_data):
+        for blobs in blob_data:
+            X_d = blobs.points[0]
+            Y_d = blobs.points[1]
+            D_d = blobs.diameters
+            X_ds_unfilt.append(X_d)
+            Y_ds_unfilt.append(Y_d)
+            D_ds_unfilt.append(D_d)
+
+
     def match_alg1(self,blob_data,p0,Q0,plot_match=False, plot_orientation=False):
         # A simple traker which solves translation and rotation simultaneously
         # TODO: We may develop alternative spatial match algorithms in the future
@@ -152,7 +162,7 @@ class SpatialMatch:
         if plot_match:
             sol = minimize(get_cost,C0,method="Powell",callback=plot)
         else:
-            sol = minimize(get_cost,C0,method="Powell",callback=plot)
+            sol = minimize(get_cost,C0,method="Powell")
         if plot_orientation:
             for view in self.Vs:
                 view.plot_vehicle()

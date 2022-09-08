@@ -1,5 +1,7 @@
 import numpy as np
 
+from scipy.spatial.transform import Rotation as R
+
 def euler_to_quaternion(psi, theta, phi):
     """Convert Euler angles to quaternions."""
     # According to Zipfel Eqn. 10.12
@@ -26,12 +28,7 @@ def quaternion_to_euler(q0, q1, q2, q3):
 
 def quaternions_to_rotation_tensor(q0, q1, q2, q3):
     """Calculate directional cosine matrix from quaternions."""
-    T_rot = np.array([
-        [q0**2+q1**2-q2**2-q3**2,  2*(q1*q2+q0*q3),  2*(q1*q3-q0*q2) ],
-        [2*(q1*q2-q0*q3),  q0**2-q1**2+q2**2-q3**2,  2*(q2*q3+q0*q1) ],
-        [2*(q1*q3+q0*q2),  2*(q2*q3-q0*q1),  q0**2-q1**2-q2**2+q3**2 ]
-        ]) # Eqn 10.14 from Zipfel
-    # T_BL += 0.5* (np.eye(3,3) - T_BI.dot(T_BI.T)).dot(T_BI)
+    T_rot = R.from_quat([q1, q2, q3, q0]).as_matrix()
     return T_rot
 
 #  def quaternion_multiply(quaternion1, quaternion0):

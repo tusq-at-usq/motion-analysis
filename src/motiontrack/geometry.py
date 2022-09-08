@@ -344,3 +344,5 @@ def cube_gen(L,blob_location_filename=None):
     B.update_normals()
     B.blobSize = L/10
     return B
+
+

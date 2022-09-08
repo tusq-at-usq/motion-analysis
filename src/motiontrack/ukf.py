@@ -25,6 +25,8 @@ class UKF:
             self._normalise_q = None
 
     def _fx(self,X,dt):
+        #  if self.normalise_quaternions:
+            #  X = self._normalise_q(X)
         # Note: Inputs not yet supported
         X_, t_ = self.dsys.integrate(dt, X, dt_max=self.dt_int_max)
         return X_[-1,:]
@@ -70,7 +72,7 @@ class UKF:
         """
         if sigmas is None:
             sigmas = MerweScaledSigmaPoints(self.dsys.get_nx(),
-                                            alpha=.1,
+                                            alpha=.001,
                                             beta=2.,
                                             kappa=-1)
 
