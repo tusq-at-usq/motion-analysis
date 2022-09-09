@@ -7,7 +7,7 @@ The order of rotation (positive RHR direction: Z, Y, X body axis).
 Below is an examaple of the camera set up for different viewpoints,
 as well as a brief animation showing three consecutive rotations.
 
-The vehicle/body coordinate system is defined as
+Geometry and camera views are handled in typical coordinate system:
 
     X----------> 1 (forward)
     | \
@@ -17,57 +17,38 @@ The vehicle/body coordinate system is defined as
    3 (down)
 """
 
-from matplotlib import pyplot as plt
-
-from motiontrack.geometry import *
-from motiontrack.body_projection import *
-from motiontrack.utils import *
+import numpy as np
+from motiontrack.body_projection import View
+from motiontrack.utils import euler_to_quaternion
+from motiontrack.sample_bodies.cube import make_cube
+from motiontrack.plot import PlotMatch
 
 def show_camera_viewpoints():
 
-    G = pyramid_gen(1)
+    body = make_cube()
+    Q = euler_to_quaternion(0, 0, 0)
+    body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
 
-    V_b = View(G,np.array([0.0,0.0,np.pi]),"bottom",'test',0)
-    V_r = View(G,np.array([0.0,np.pi/2,0.0]),"rear",'test',0)
-    V_f = View(G,np.array([np.pi,np.pi/2,0]),"front",'test',0)
-    V_t = View(G,np.array([0.0000,0.0000,0.000000]),"top",'test',0)
-    V_w = View(G,np.array([np.pi/2,np.pi/2,0.0]),"west",'test',0)
-    V_e = View(G,np.array([-np.pi/2,np.pi/2,0.0]),"east",'test',0)
-   
-    Vs = [V_b,V_r,V_f,V_t,V_w,V_e]
-       
-    for V in Vs:
-        V.update()
-        V.plot_vehicle()
-    plt.pause(1)
-    #  input("Press to close:")
-    plt.close('all')
+    view__t = View(body,np.array([-np.pi/2,0.0,0.0]),"top",'test',0)
+    view__w = View(body,np.array([np.pi, 0, np.pi/2]),"west",'test',0)
+    view__e = View(body,np.array([0, 0, np.pi/2]),"east",'test',0)
+    view__f = View(body,np.array([np.pi/2, 0, np.pi/2]),"front",'test',0)
+    views = [view__t, view__w, view__e, view__f]
 
-def create_example_view_rotation():
-    G = pyramid_gen(1)
-    V = View(G,np.array([0.0000,0.00000,0.000000]),"example",'example',1)
+    plot_t = PlotMatch('Top')
+    plot_w = PlotMatch('West')
+    plot_e = PlotMatch('East')
+    plot_f = PlotMatch('Front')
+    plots = [plot_t, plot_w, plot_e, plot_f]
+     
+    for plot, view in zip(plots, views):
+        view.update_blobs()
+        plot.update_projection(view.get_2D_data())
 
-    angles = np.linspace(0,0.25*np.pi,5)
-
-    r1 = []
-    r2 = []
-    r3 = []
-    for angle in angles:
-        r1.append(euler_to_quaternion(angle,0,0))
-        r2.append(euler_to_quaternion(1.75*np.pi,angle,0.0))
-        r3.append(euler_to_quaternion(1.75*np.pi,1.75*np.pi,angle))
-
-    q_ar = r1+r2+r3
-    titles = ["z rotation"]*20 + ["y rotation"]*20 + ["x rotation"]*20
-
-    for q,title in zip(q_ar,titles):
-        G.update([0,0,0],q,0)
-        V.update()
-        V.plot_vehicle(title)
-    plt.close()
+    body.plot()
+    input("Press to close")
 
 if __name__=='__main__':
 
     show_camera_viewpoints()
-    create_example_view_rotation()
 

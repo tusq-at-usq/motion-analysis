@@ -16,35 +16,38 @@ from motiontrack.sample_bodies.cube import make_cube
 
 from motiontrack.plot import PlotMatch
 
-STL_NAME = 'data/cube.stl'
-
-def load_stl(STL_NAME):
+def load_stl():
 
     body = make_cube()
 
     Q = euler_to_quaternion(0, 0, 0)
     body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
 
-    Q2 = np.linspace(0,0.5,100)
-    Q3 = np.linspace(0,1,100)
-    Q1 = np.linspace(0,np.pi/2,100)
+    Q2 = np.linspace(0,0.5,300)
+    Q3 = np.linspace(0,2,300)
+    Q1 = np.linspace(0,np.pi,300)
 
     X1 = np.linspace(0,50,100)
 
-    V = View(body,np.array([-np.pi/2,0.0,0.0]),"top",'test',0)
+    view_t = View(body,np.array([-np.pi/2,0.0,0.0]),"top",'test',0)
     #  V = View(body,np.array([np.pi, 0, np.pi/2]),"west",'test',0)
-    #  V = View(body,np.array([0, 0, np.pi/2]),"east",'test',0)
+    view_e = View(body,np.array([0, 0, np.pi/2]),"east",'test',0)
     #  V = View(body,np.array([np.pi/2, 0, np.pi/2]),"front",'test',0)
+    views = [view_t, view_e]
 
-    plot = PlotMatch('test')
+    plot_t = PlotMatch('Top')
+    plot_e = PlotMatch('East')
+    plots = [plot_t, plot_e]
+    body.plot()
+    input("Press key to start animation")
 
     for q1, q2, q3 in zip(Q1, Q2, Q3):
         Q = euler_to_quaternion(q1, q2, q3)
         body.update([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
-        V.update_blobs()
-        V.update_surfaces()
-        blob_data = V.get_2D_data()
-        plot.update_projection(blob_data)
+        for view, plot in zip(views, plots):
+            view.update_blobs()
+            blob_data = view.get_2D_data()
+            plot.update_projection(blob_data)
         body.plot()
 
     plot.close()
@@ -52,5 +55,5 @@ def load_stl(STL_NAME):
 
 if __name__=='__main__':
 
-    load_stl(STL_NAME)
+    load_stl()
 
