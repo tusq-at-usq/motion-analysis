@@ -1,10 +1,9 @@
+
+import copy
 import numpy as np
 from numpy import linalg as la
 import stl
-from matplotlib import pyplot as plt
-from mpl_toolkits import mplot3d
 import vtkplotlib as vpl
-import copy
 from scipy.spatial.transform import Rotation as R
 
 
@@ -95,7 +94,7 @@ class BodyProjection:
     # TODO: Initialise plot properly
     def plot(self):
         if not hasattr(self, 'fig'):
-            self.fig = vpl.QtFigure()
+            self.fig = vpl.QtFigure(name='Body mesh plot')
             vpl.view(camera_direction=[0,1,0], up_view=[0, 0, 1])
             vpl.gcf().update()
             vpl.reset_camera(fig=self.fig)  

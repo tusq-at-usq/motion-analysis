@@ -31,11 +31,27 @@ def quaternions_to_rotation_tensor(q0, q1, q2, q3):
     T_rot = R.from_quat([q1, q2, q3, q0]).as_matrix()
     return T_rot
 
-#  def quaternion_multiply(quaternion1, quaternion0):
-    #  w0, x0, y0, z0 = quaternion0
-    #  w1, x1, y1, z1 = quaternion1
-    #  return np.array([-x1 * x0 - y1 * y0 - z1 * z0 + w1 * w0,
-                    #  x1 * w0 + y1 * z0 - z1 * y0 + w1 * x0,
-                    #  -x1 * z0 + y1 * w0 + z1 * x0 + w1 * y0,
-                    #  x1 * y0 - y1 * x0 + z1 * w0 + w1 * z0], dtype=np.float64)
+def _to_matrix(q):
+    """ Quaternion order is q = {a1 + bj + cw + d} """
+    Q = np.array([[q[0], q[1], q[2], q[3]],
+                  [-q[1], q[0], -q[3], q[2]],
+                  [-q[2], q[3], q[0], -q[1]],
+                  [-q[3], -q[2], q[1], q[0]]])
+    return Q
+
+def quaternion_multiply(q_mul, q0):
+    """ Quaternion order is q = {a1 + bj + cw + d} """
+    Q0 = _to_matrix(q0)
+    Q_mul = _to_matrix(q_mul)
+    Q2 = Q_mul@Q0
+    return Q2[0,:]
+
+def quaternion_subtract(q0,q_sub):
+    """ Finds the quaternion rotation difference such that:
+    q_diff * q_sub = q0, i.e. multipl q0 by dq
+    """
+    Q0 = _to_matrix(q0)
+    Q_sub = _to_matrix(q_sub)
+    Q_diff = Q0@np.linalg.inv(Q_sub)
+    return Q_diff[0,:]
 
