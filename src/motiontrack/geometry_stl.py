@@ -97,7 +97,7 @@ class BodyProjection:
             self.fig = vpl.QtFigure(name='Body mesh plot')
             vpl.view(camera_direction=[0,1,0], up_view=[0, 0, 1])
             vpl.gcf().update()
-            vpl.reset_camera(fig=self.fig)  
+            vpl.reset_camera(fig=self.fig)
         if hasattr(self, 'mesh_plot'):
             self.fig -= self.mesh_plot
         if hasattr(self, 'blob_plot'):
@@ -105,7 +105,7 @@ class BodyProjection:
         self.blob_plot = vpl.scatter(self.blob_x, color='k', fig=self.fig)
         self.mesh_plot = vpl.mesh_plot(self, fig=self.fig, opacity=1)
         vpl.gcf().update()
-        vpl.reset_camera(fig=self.fig)  
+        vpl.reset_camera(fig=self.fig)
         self.fig.show(block=False)
 
 class BodySTL:
@@ -152,7 +152,7 @@ class BodySTL:
                 print("WARNING: Blob",i," greater than 1% units from surface")
             candidates = np.where((distances - np.min(distances))<scale/100)[0]
             if len(candidates)>1:
-                print("Multiple intersecting surfaces found for blob",i)
+                #  print("Multiple intersecting surfaces found for blob",i)
                 av_dists = np.mean(np.linalg.norm(x-self.mesh.vectors[[candidates]],axis=3),axis=2)[0]
                 blob_surfaces.append(candidates[np.argmin(av_dists)])
             else:
@@ -206,6 +206,12 @@ class BodySTL:
     @property
     def vectors(self):
         return self.sub_body.vectors
+
+    def to_vectors(self, x):
+        return self.sub_body.to_vectors(x)
+
+    def to_mesh(self, x):
+        return self.sub_body.to_ndarray(x)
 
     def plot(self):
         self.sub_body.plot()

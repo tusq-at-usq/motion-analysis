@@ -35,15 +35,6 @@ class SpatialMatch:
         plt.close()
         return p,Q
 
-    #  def to_vectors(self, blob_data):
-        #  for blobs in blob_data:
-            #  X_d = blobs.points[0]
-            #  Y_d = blobs.points[1]
-            #  D_d = blobs.diameters
-            #  X_ds_unfilt.append(X_d)
-            #  Y_ds_unfilt.append(Y_d)
-            #  D_ds_unfilt.append(D_d)
-
     def match_alg1(self,blob_data, p0, Q0, plots):
         # A simple traker which solves translation and rotation simultaneously
         # TODO: We NEED to develop better spatial match algorithms in the future
@@ -73,8 +64,7 @@ class SpatialMatch:
             # Update model and views
             p = np.array(p0) + view.offset 
             self.B.update(p,Q0)
-            view.update_blobs()
-            p_p = getattr(view.get_2D_data(),'points').T
+            p_p = view.get_blobs().points.T
 
             D = np.array(D_d)*view.scale # Diameters from image
             p_p = p_p * view.scale # Blob vectors from projection
@@ -108,8 +98,7 @@ class SpatialMatch:
                 ps = p0 * C[4:7]
                 ps = ps + view.offset
                 self.B.update(ps,Qs)
-                view.update_blobs()
-                blobs = view.get_2D_data()
+                blobs = view.get_blobs()
                 p_p = blobs.points
 
                 blob_map = []
@@ -134,37 +123,14 @@ class SpatialMatch:
 
         def callback_plot(X):
             for view, X_d, Y_d, plot in zip(self.Vs, X_ds, Y_ds, plots):
-                blobs_p = view.get_2D_data()
+                blobs_p = view.get_blobs()
                 p_i = np.array([X_d, Y_d])
                 plot.update_observation(p_i)
                 plot.update_projection(blobs_p)
                 time.sleep(0.01)
 
-        #  if plot_match:
-            #  blob_fig,axs = plt.subplots(1,2)
-            #  axs.flatten()
-            #  def plot(X):
-                #  for view,ax,X_d,Y_d,D_d in zip(self.Vs,axs,X_ds,Y_ds,D_ds):
-                    #  ax.clear()
-                    #  #  ax.scatter(X_d,Y_d,s=D,facecolors='none',edgecolor='k',)
-                    #  blobs = view.get_2D_data()
-                    #  p_p = blobs.points #* view.scale
-                    #  D_p = blobs.diameters *500
-
-                    #  proj = ax.scatter(p_p[0],p_p[1],s=D_p,color='r',label='projected')
-                    #  ax.set_aspect("equal")
-                    #  ax.set_title(view.name)
-
-                    #  D_d = np.array(D_d)*view.scale*800
-                    #  data = ax.scatter(X_d,Y_d,s=D_d,facecolors='none',edgecolor='k',label='data')
-                #  plt.pause(0.01)
-                #  blob_fig.canvas.draw()
-                #  axs[1].legend()
-                #  plt.tight_layout()
-
         C0 = np.ones(7) 
         sol = minimize(get_cost,C0,method="Powell",callback=callback_plot)
-        #  sol = minimize(get_cost,C0,method="Powell")
 
         C = sol.x
         Q_final = Q0 * C[0:4]
