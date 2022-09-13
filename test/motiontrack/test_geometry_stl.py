@@ -16,16 +16,18 @@ from motiontrack.sample_bodies.cube import make_cube
 
 from motiontrack.plot import PlotMatch
 
-def load_stl():
+def load_stl(trigger_start=False):
 
     body = make_cube()
 
     Q = euler_to_quaternion(0, 0, 0)
     body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
 
-    Q2 = np.linspace(0,0.5,300)
-    Q3 = np.linspace(0,2,300)
-    Q1 = np.linspace(0,np.pi,300)
+    steps = 300
+
+    Q2 = np.linspace(0,0.5,50)
+    Q3 = np.linspace(0,2,50)
+    Q1 = np.linspace(0,np.pi,50)
 
     X1 = np.linspace(0,50,100)
 
@@ -39,16 +41,20 @@ def load_stl():
     plot_e = PlotMatch('East')
     plots = [plot_t, plot_e]
     body.plot()
-    input("Press key to start animation")
+    if trigger_start:
+        input("Press key to start animation")
 
     for q1, q2, q3 in zip(Q1, Q2, Q3):
         Q = euler_to_quaternion(q1, q2, q3)
         body.update([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
         for view, plot in zip(views, plots):
-            view.update_blobs()
-            blob_data = view.get_2D_data()
+            blob_data = view.get_blobs()
+            mesh_data = view.get_mesh()
             plot.update_projection(blob_data)
+            plot.update_mesh(*mesh_data)
         body.plot()
+    if trigger_start:
+        input("Press key to close")
 
     plot.close()
 

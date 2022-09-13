@@ -43,20 +43,18 @@ def test_spatial_match(print_flag=0):
     Q = euler_to_quaternion(*EA)
 
     body.update(p, Q)
-    V_t.update_blobs()
-    V_e.update_blobs()
 
     # True blob locations and diameters
-    blobs_t = V_t.get_2D_data()
-    blobs_e = V_e.get_2D_data()
+    blobs_t = V_t.get_blobs()
+    blobs_e = V_e.get_blobs()
 
     # Create initial estimated guess with error
     p_est = p + np.random.rand(3)*2
-    EA_est = EA  + np.random.rand(3)*np.pi/12
+    EA_est = EA  + np.random.rand(3)*np.pi/6
 
     Q_est = euler_to_quaternion(*EA_est)
 
-    BLOB_ERROR_SCALE = 1
+    BLOB_ERROR_SCALE = 0
 
     # Add gaussian error to X and Y blob data (to approximate imperfect measured data)
     blobs_er_t = BlobsFrame(blobs_t.points + \
@@ -83,20 +81,22 @@ def test_spatial_match(print_flag=0):
     # Match position and orientation
     p_, Q_ = S.run_match([blobs_er_t, blobs_er_e],p_est,Q_est, [plot_t, plot_e])
 
-    plot_t.close()
-    plot_e.close()
-
     if print_flag:
+        
+        EA_ = np.array(quaternion_to_euler(*Q_))
         print("----- TEST COMPLETE -----")
-        print("True state:")
-        print("p = ",p)
-        print("E = ",quaternion_to_euler(*Q))
+        print("True state")
+        print(" = ",quaternion_to_euler(*Q))
         print("Initialised state:")
         print("p = ",p_est)
         print("E = ",quaternion_to_euler(*Q_est))
         print("Matched state:")
         print("p = ",p_)
         print("E = ",quaternion_to_euler(*Q_))
+
+    plot_t.close()
+    plot_e.close()
+
 
 if __name__=='__main__':
     test_spatial_match(1)

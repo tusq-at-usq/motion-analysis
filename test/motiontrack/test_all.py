@@ -17,9 +17,7 @@ from test_tracking_loop import test_tracking_loop
 test_tracking_loop()
 print("Test module: 'ukf.py' :".ljust(60)+"SUCCESS")
 
-from test_geometry_projection import show_camera_viewpoints,\
-    create_example_view_rotation
-show_camera_viewpoints()
-create_example_view_rotation()
+from test_geometry_stl import load_stl 
+load_stl()
 print("Test module: 'geometry.py' :".ljust(60)+"SUCCESS")
 
