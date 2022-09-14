@@ -10,15 +10,15 @@ Below is a description of the main capabilities:
 
 The structure of the tracking environment allows for any type of observation of
 the form 
-$$ \bm{y}_i = h_i(\bm{x}) $$
+$$ \mathbf{y}_i = h_i(\mathbf{x}) $$
 
 An abstract class `ObservationGroup()` provides a default interface between an
 observation and the tracking code. This class should be inherited for specific
 observation types (such as blob matching, IMUs etc.)
 
 One or more instances of `ObservationGroup` are combined into a single set of
-observations $\bm{y}$, measurement uncertainty matrix $[R]$, and measurement
-function $h(\bm{x})$. Measurements can be contradictory (such as two
+observations $\mathbf{y}$, measurement uncertainty matrix $[R]$, and measurement
+function $h(\mathbf{x})$. Measurements can be contradictory (such as two
 simultaneous position measurements). The measurement function is primarily
 used by the extended Kalman filter to create the observation Jacobian $[H]$.
 
@@ -85,13 +85,13 @@ during iterative spatial matching.
 
 When using 2D blob data to track bodies (such as high-speed 2D camera images),
 the state observables are three position coordinates and four rotational
-quaternions, so that $\bm{y}_\mathrm{image} = [x, y, z, q0, q1, q2, q3]^\mathrm{T}$. 
+quaternions, so that $\mathbf{y}_\mathrm{image} = [x, y, z, q0, q1, q2, q3]^\mathrm{T}$. 
 
 More than one different view angle is required to determine the full set of
 observations (such as top and east view).
 
 For each image, the *measured* blob locations are compared with the *projected* 
-blob locations. The observation vector $\bm{y}$ is then iteratively varied until
+blob locations. The observation vector $\mathbf{y}$ is then iteratively varied until
 the best match between measured and projected blobs is achieved. The
 algorithm and cost function for this matching algorithm could be improved, and
 is under development. 
