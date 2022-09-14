@@ -2,6 +2,11 @@
 
 A selection of Python tools used to analyse object motion, intended predominantly for experimental motion data.
 
+![alt text](../../docs/img/tracking.png?raw=true "tracker_outline")
+![alt text](../../docs/img/mesh.png?raw=true "tracker_outline")
+![alt text](../../docs/img/top.png?raw=true "tracker_outline")
+![alt text](../../docs/img/east.png?raw=true "tracker_outline")
+
 ## Install
 
 Clone the repository:
@@ -24,15 +29,16 @@ This repository contains the following Python packages
 
 ## Dependencies 
 
-Most dependencies should be automatically installed during the package install
+Most dependencies should be automatically installed during the package install.
+If you encounter unmet dependencies, please contact Andy. 
 
 ## Documentation 
 
-Documentation to be added to [`docs`](/docs/)
+Documentation to be added to [`docs`](/docs/).
 
 ## Tests
 
-Tests the functionality of individual functions, for use when modifying packages
+The tests directory contains scripts to test the functionality of individual modules, and should be used when modifying core modules. 
 
 ## Examples
 
@@ -41,7 +47,7 @@ Includes
 
 - 3DoF tracking from XYZ data
 - 6DoF tracking from XYZ and quaternion data
-- more to be included...
+- 6DoF tracking from 2-D projected blob data
 
 
 
