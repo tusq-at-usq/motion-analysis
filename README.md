@@ -2,10 +2,10 @@
 
 A selection of Python tools used to analyse object motion, intended predominantly for experimental motion data.
 
-![alt_text](/docs/img/tracking.png?raw=true "mesh_view")
-<!-- ![alt_text](/docs/img/mesh.png?raw=true "mesh_view") -->
-<!-- ![alt text](/docs/img/top.png?raw=true "top_blob_match") -->
-<!-- ![alt text](/docs/img/east.png?raw=true "east_blob_match") -->
+![alt_text](/docs/img/states.png?raw=true "mesh_view")
+![alt_text](/docs/img/mesh.png?raw=true "mesh_view")
+![alt text](/docs/img/top.png?raw=true "top_blob_match")
+![alt text](/docs/img/east.png?raw=true "east_blob_match")
 
 ## Install
 
