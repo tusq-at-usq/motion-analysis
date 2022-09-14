@@ -5,7 +5,7 @@ A selection of Python tools used to analyse object motion, intended predominantl
 Future development will also incorporate data smoothing, so that forces and
 moments can be extracted from the motion data. 
 
-![alt_text](/docs/img/example_gif.gif.png?raw=true "mesh_view")
+![alt_text](/docs/img/example_gif.gif?raw=true "mesh_view")
 <!-- ![alt_text](/docs/img/mesh.png?raw=true "mesh_view") -->
 <!-- ![alt text](/docs/img/top.png?raw=true "top_blob_match") -->
 <!-- ![alt text](/docs/img/east.png?raw=true "east_blob_match") -->
