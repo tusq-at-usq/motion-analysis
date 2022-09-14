@@ -5,10 +5,10 @@ A selection of Python tools used to analyse object motion, intended predominantl
 Future development will also incorporate data smoothing, so that forces and
 moments can be extracted from the motion data. 
 
-![alt_text](/docs/img/example_gif.gif?raw=true "mesh_view")
-<!-- ![alt_text](/docs/img/mesh.png?raw=true "mesh_view") -->
-<!-- ![alt text](/docs/img/top.png?raw=true "top_blob_match") -->
-<!-- ![alt text](/docs/img/east.png?raw=true "east_blob_match") -->
+![alt_text](/docs/img/example_gif.gif?raw=true "example")
+*The above shows an example of 6DoF tracking of a cube using blob tracking from
+two camera viewpoints. Errors have been added to simulated image data, and
+errors added to the underlying dynamic system used by the Kalman filter.*
 
 ## Install
 
