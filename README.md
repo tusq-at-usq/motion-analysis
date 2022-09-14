@@ -2,10 +2,10 @@
 
 A selection of Python tools used to analyse object motion, intended predominantly for experimental motion data.
 
-![alt text](../../docs/img/tracking.png?raw=true "tracker_outline")
-![alt text](../../docs/img/mesh.png?raw=true "tracker_outline")
-![alt text](../../docs/img/top.png?raw=true "tracker_outline")
-![alt text](../../docs/img/east.png?raw=true "tracker_outline")
+![alt_text](/docs/img/tracking.png?raw=true "tracker_outline")
+![alt_text](/docs/img/mesh.png?raw=true "tracker_outline")
+![alt text](/docs/img/top.png?raw=true "tracker_outline")
+![alt text](/docs/img/east.png?raw=true "tracker_outline")
 
 ## Install
 
