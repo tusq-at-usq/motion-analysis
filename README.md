@@ -1,6 +1,9 @@
 # USQ motion analysis codes
 
-A selection of Python tools used to analyse object motion, intended predominantly for experimental motion data.
+A selection of Python tools used to analyse object motion, intended predominantly for experimental motion data. Multiple types of observations (image blobs detection, IMU etc.) can be combined to estimate the state of the system at the current time point. 
+
+Future development will also incorporate data smoothing, so that forces and
+moments can be extracted from the motion data. 
 
 ![alt_text](/docs/img/states.png?raw=true "mesh_view")
 ![alt_text](/docs/img/mesh.png?raw=true "mesh_view")
@@ -36,6 +39,8 @@ If you encounter unmet dependencies, please contact Andy.
 
 Documentation to be added to [`docs`](/docs/).
 
+A description of each package is provided in the `README` of each package. 
+
 ## Tests
 
 The tests directory contains scripts to test the functionality of individual modules, and should be used when modifying core modules. 
@@ -43,11 +48,16 @@ The tests directory contains scripts to test the functionality of individual mod
 ## Examples
 
 Examples of how the different packages integrate to track dynamic systems.
-Includes
+Include
 
 - 3DoF tracking from XYZ data
 - 6DoF tracking from XYZ and quaternion data
-- 6DoF tracking from 2-D projected blob data
+- 6DoF tracking from 2-D projected blob data from a cube
 
+## Example structure of tracker design
+
+The below flowchart shows an example structure 
+
+![alt text](/docs/img/motiontrack_diagram.png?raw=true "motiontrack_structure")
 
 
