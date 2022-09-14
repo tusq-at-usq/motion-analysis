@@ -8,7 +8,7 @@ Below is a description of the main capabilities:
 
 The structure of the tracking environment allows for any type of observation of
 the form 
-$$ \mathbf{y}_i = h_i(\mathbf{x}) $$
+$$ {\mathbf{y}}_i = h_i( \mathbf{x} ) $$
 
 An abstract class `ObservationGroup()` provides a default interface between an
 observation and the tracking code. This class should be inherited for specific
@@ -31,7 +31,7 @@ Body geometry is handled by the `BodySTL()` class, and data can be imported in .
 method. STL files describe the body as a set of triangular surfaces, using the
 local coordinate system (x: forward, y: left, z: upwards).
 
-Surface blobs are added using sets of (x,y,z) coordinates. The surface on which
+Surface blobs are added using sets of $(x,y,z)$ coordinates. The surface on which
 the point intersects (or almost intersects) is paired to the blob, which
 determines the blobs visibility at a given body orientation. A warning is
 provided if a blob does not (almost) intersect a surface.
