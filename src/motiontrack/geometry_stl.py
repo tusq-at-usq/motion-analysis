@@ -127,6 +127,7 @@ class BodySTL:
             #  self.mesh.data['vectors'] *= 1/1000
             #  self.mesh.data['normals'] *= 1/1000
         self.normal_mags = la.norm(self.mesh.normals,axis=1)
+
     def define_manually(self, vectors):
         pass
 

@@ -1,75 +1,114 @@
 # `motiontrack`
 
-A framework for tracking vehicle motion using measured data (initially blob point tracking). 
-The structure of the code is shown below: 
-![alt text](../../docs/img/motiontrack_diagram.png?raw=true "tracker_outline")
+`motiontrack` incorporates the general class and functions for tracking 
 
 Each block shown is a separate module, and is described in further detail below.
 
-Below is a description of each module
+Below is a description of the main capabilities:
 
-## Dynamic system
+## Observations
 
-The Dynamic system is contained in the separate 'dynamicsystem' package. 
-It integrates the continuous-time dynamic equations to get the model-estimated state. 
- 
-$$ \boldsymbol{x'} _k = f( \boldsymbol{x} _{k-1} ) $$
- 
+The structure of the tracking environment allows for any type of observation of
+the form 
+$$ \bm{y}_i = h_i(\bm{x}) $$
 
-## Geometry and blob projection
+An abstract class `ObservationGroup()` provides a default interface between an
+observation and the tracking code. This class should be inherited for specific
+observation types (such as blob matching, IMUs etc.)
 
-To track vehicle position from blobs, a 3D representation of the vehicle and blob locations is required.
-For a given vehicle position and orientation, blob locations can be projected to any 2D view angle.
+One or more instances of `ObservationGroup` are combined into a single set of
+observations $\bm{y}$, measurement uncertainty matrix $[R]$, and measurement
+function $h(\bm{x})$. Measurements can be contradictory (such as two
+simultaneous position measurements). The measurement function is primarily
+used by the extended Kalman filter to create the observation Jacobian $[H]$.
 
-### Geometry
+The `combine_observables` includes the functions required to handle multiple
+observation groups, such as querying the next measurement timestep (which may
+not be all groups if they are not synchronised at a similar frequency),
+combining observations, uncertainties, and measurement functions. 
 
-Geometry is defined by four classes: Point, Surface, Blob,and Body.
+## Geometry
 
-Note that geomtry directions are defined as:
-X = north
-Y = east
-Z = down (into earth)
+Body geometry can be imported in .STL format using the `import_file(filename)`
+method. STL files describe the body as a set of triangular surfaces, using the
+local coordinate system (x: forward, y: left, z: upwards).
 
-These directions apply to local and body coordiantes.
+Surface blobs are added using sets of (x,y,z) coordinates. The surface on which
+the point intersects (or almost intersects) is paired to the blob, which
+determines the blobs visibility at a given body orientation. A warning is
+provided if a blob does not (almost) intersect a surface.
 
-#### `Point()`
-All points are fixed to the rigid body, and are translated and rotated with the body
+A projection of the body at any position and orientation is created with the
+`update(X, Q)` method. The arguments are absolute position and
+orientation from the original position, not from the last update position.
 
-$$ \boldsymbol{p} ^\mathrm{L} = [\boldsymbol{T}] ^\mathrm{LB} \boldsymbol{p} ^\mathrm{B} + s ^\mathrm{B} _\mathrm{L} $$
+Blob and surface mesh data can be accessed via `blobs` and `vectors`
+attributes.
+
+An interactive 3D projection of the geometry at the current projected position
+and orientation can be viewed by calling the `plot()` method. 
+
+## Projection
+
+The 3-dimensional body can be projected onto any 2-dimensional viewpoint. 
+Each `View()` class represents a different viewpoint, defined by 3 Euler angle
+rotations  $(\psi, \theta, \phi)$ pointing towards the local coordinate origin. 
+The initial orientation(at Euler angles 0,0,0) aligns with the X and Y axis 
+(looking downwards from east). Other common view angles include:
+- Top view facing forward: (-$\pi$/2, 0, 0)
+- East view: (0, 0, $\pi$/2)
+- West view: ($\pi$, 0, $\pi$/2)
+- Front view: ($\pi$/2, 0, $\pi$/2)
+
+Only surfaces and blobs with a normal vector pointing towards the camera view
+are shown in the 2-dimensional projection. In order to avoid data at very acute
+surface angles, a threshold of the dot product of the surface normal vector, and
+viewing angle vector is specific, with a default value of 0.01. 
+
+Projected 2-dimensional blob locations are accessed by the `get_blobs()` method,
+and 2D surface mesh data is accessed via the `get_mesh()` method. 
+
+### Blob data
+
+A 2D view of blob data is stored in the `BlobsFrame()` class, with the attributes
+- `n`: number of blobs in frame
+- `points`: (2x$n$) array of 2-dimensional coordinates
+- `diameters`: ndarray of blob diameters.
+
+This class can be extended to include additional blob data extracted from image
+processing (such as ovality, colour). 
+
+The BlobFrame provides a method to pass *observed* and *projected* blob data
+during iterative spatial matching. 
+
+## Spatial match
+
+When using 2D blob data to track bodies (such as high-speed 2D camera images),
+the state observables are three position coordinates and four rotational
+quaternions, so that $\bm{y}_\mathrm{image} = [x, y, z, q0, q1, q2, q3]^\mathrm{T}$. 
+
+More than one different view angle is required to determine the full set of
+observations (such as top and east view).
+
+For each image, the *measured* blob locations are compared with the *projected* 
+blob locations. The observation vector $\bm{y}$ is then iteratively varied until
+the best match between measured and projected blobs is achieved. The
+algorithm and cost function for this matching algorithm could be improved, and
+is under development. 
+
+Also under development is a dynamically prescribed measurement uncertainty
+vector $[R]_\mathrm{image}$ which is a function of the correlation between the
+final match between measured and projected blob data. 
+
+## Plotting
+
+Three main types of plots are available:
+- `PlotMatch`: Shows the match between measured and projected 2D blob locations.
+- `PlotTrack`: Tracks the state vector for each update step
+- `BodySTL.plot()`: Plots the current body position and orientation in an
+    interactive 3D plot.
 
 
-where $[\boldsymbol{T}] ^\mathrm{LB}$ is the rotation tensor from vehicle body frame to local frame in local coordinates, and $s ^\mathrm{B} _\mathrm{L}$ is the position of the vehicle centre of gravity in local coordiantes. 
-
-#### `Surface()`
-A surface is made of 3 or more points, ordered in a counter-clockwise direction for an ourward surface normal vector (right hand rule).
-A check is made that the points lie on the same plane. 
-
-#### `Blob()` 
-A blob is essentially a point.
-It is currently defined differently, so that additional information can be added later if needed (diameter, color etc).
-
-Blobs are currently appended to a surface, which currently determins the blobs visibility (i.e. when surface normal is pointing towards the viewpoint). 
-Future development will define blob visibilty for curved surfaces (cylindrical and spherical). 
-
-#### `Body()`
-A body is made up of multiple surfaces.
-A warning is displayed if the surfaces do not form a closed object.
-The body includes an `update(X,Q)` routine, which updates the local position of all points. 
-
-### Views
-A view object is a 2D projection of the vehicle blobs.
-Views are defined by their Euler rotation, with rotation vector $[0,0,0]$ looking down on the model towards the local coordinate origin facing north.
-In this model Euler angles are rotations about the vehicle z, y and x axis (in that order).
-Mutliple different views of the same body can be defined. 
-
-Refer to the example `example_geometry_projection.py` for common view directions and an example of view rotation.
-
-Note: Currently only parallel view (i.e.schlieren) is supported.
-Future development will support perspective views.
-
-# Spatial matching
-
-Spatial matching is the process of determining a measured position $[x,y,z] ^\mathrm{L}$ and rotation in quaternions $[q_0,q_1,q_2,q_3] ^\mathrm{BL}$.
 
 
 

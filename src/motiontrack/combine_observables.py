@@ -82,8 +82,6 @@ def create_residual_function(obs: List[ObservationGroup]):
         return np.array(residual)
     return residual_fn
 
-
-
 def get_next_obs_group(obs_all: List[ObservationGroup], t: float, dt_min: float)\
         -> Tuple[float, List[ObservationGroup], int]:
     """
