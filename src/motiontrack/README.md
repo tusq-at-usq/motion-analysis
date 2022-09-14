@@ -27,7 +27,7 @@ combining observations, uncertainties, and measurement functions.
 
 ## Geometry
 
-Body geometry can be imported in .STL format using the `import_file(filename)`
+Body geometry is handled by the `BodySTL()` class, and data can be imported in .STL format using the `import_file(filename)`
 method. STL files describe the body as a set of triangular surfaces, using the
 local coordinate system (x: forward, y: left, z: upwards).
 
