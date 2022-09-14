@@ -8,9 +8,8 @@ moments can be extracted from the motion data.
 ![alt_text](/docs/img/example_gif.gif?raw=true "example")
 *The above shows an example of 6DoF tracking of a cube using blob tracking from
 two camera viewpoints. Noise error was added to simulated image data, and the 
-system dynamics used by the Kalman filter is incorrect.
-
-Grey lines show the 'true' solution'*
+system dynamics used by the Kalman filter is deliberately inaccurate. 
+Grey lines show the 'true' solution*
 
 ## Install
 
