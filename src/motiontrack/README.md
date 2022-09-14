@@ -51,12 +51,12 @@ and orientation can be viewed by calling the `plot()` method.
 The 3-dimensional body can be projected onto any 2-dimensional viewpoint. 
 Each `View()` class represents a different viewpoint, defined by 3 Euler angle
 rotations  $(\psi, \theta, \phi)$ pointing towards the local coordinate origin. 
-The initial orientation(at Euler angles 0,0,0) aligns with the X and Y axis 
+The initial orientation(at Euler angles 0,0,0) aligns with the $x$ and $y$ axis 
 (looking downwards from east). Other common view angles include:
-- Top view facing forward: (-$\pi$/2, 0, 0)
-- East view: (0, 0, $\pi$/2)
-- West view: ($\pi$, 0, $\pi$/2)
-- Front view: ($\pi$/2, 0, $\pi$/2)
+- Top view facing forward: (-$\pi /2$, 0, 0)
+- East view: (0, 0, $\pi /2$)
+- West view: ($\pi$, 0, $\pi /2$)
+- Front view: ($\pi /2$, 0, $\pi /2$)
 
 Only surfaces and blobs with a normal vector pointing towards the camera view
 are shown in the 2-dimensional projection. In order to avoid data at very acute
