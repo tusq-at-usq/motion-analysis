@@ -123,8 +123,10 @@ class BodySTL:
     def import_file(self, filename):
         self.mesh = stl.mesh.Mesh.from_file(filename)
         self.n_faces = self.mesh.data.shape[0]
+        #  if units == 'mm':
+            #  self.mesh.data['vectors'] *= 1/1000
+            #  self.mesh.data['normals'] *= 1/1000
         self.normal_mags = la.norm(self.mesh.normals,axis=1)
-
     def define_manually(self, vectors):
         pass
 

@@ -94,6 +94,7 @@ def test_spatial_match(print_flag=0):
         print("p = ",p_)
         print("E = ",quaternion_to_euler(*Q_))
 
+        input("Press to close figures")
     plot_t.close()
     plot_e.close()
 

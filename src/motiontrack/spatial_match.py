@@ -124,13 +124,17 @@ class SpatialMatch:
         def callback_plot(X):
             for view, X_d, Y_d, plot in zip(self.Vs, X_ds, Y_ds, plots):
                 blobs_p = view.get_blobs()
+                frame_p = view.get_mesh()
                 p_i = np.array([X_d, Y_d])
                 plot.update_observation(p_i)
                 plot.update_projection(blobs_p)
-                time.sleep(0.01)
+                plot.update_mesh(*frame_p)
+                #  time.sleep(0.01)
 
         C0 = np.ones(7) 
-        sol = minimize(get_cost,C0,method="Powell",callback=callback_plot)
+        sol = minimize(get_cost,C0,method="Powell",callback=callback_plot, 
+                       options={'xtol':1e-4,
+                                'ftol':1e-2})
 
         C = sol.x
         Q_final = Q0 * C[0:4]
