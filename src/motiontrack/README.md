@@ -8,7 +8,7 @@ Below is a description of the main capabilities:
 
 The structure of the tracking environment allows for any type of observation of
 the form 
-$$\mathbf{y}}_i = h_i(\mathbf{x})$$
+$$\mathbf{y}_i = h_i(\mathbf{x})$$
 
 An abstract class `ObservationGroup()` provides a default interface between an
 observation and the tracking code. This class should be inherited for specific
