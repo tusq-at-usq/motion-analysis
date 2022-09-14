@@ -2,8 +2,6 @@
 
 `motiontrack` incorporates the general class and functions for tracking 
 
-Each block shown is a separate module, and is described in further detail below.
-
 Below is a description of the main capabilities:
 
 ## Observations
