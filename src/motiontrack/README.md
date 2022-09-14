@@ -53,10 +53,10 @@ Each `View()` class represents a different viewpoint, defined by 3 Euler angle
 rotations  $(\psi, \theta, \phi)$ pointing towards the local coordinate origin. 
 The initial orientation(at Euler angles 0,0,0) aligns with the $x$ and $y$ axis 
 (looking downwards from east). Other common view angles include:
-- Top view facing forward: (-$\pi /2$, 0, 0)
+- Top view facing forward: ( -$\pi /2$, 0, 0)
 - East view: (0, 0, $\pi /2$)
-- West view: ($\pi$, 0, $\pi /2$)
-- Front view: ($\pi /2$, 0, $\pi /2$)
+- West view: ( $\pi$, 0, $\pi /2$)
+- Front view: ( $\pi /2$, 0, $\pi /2$)
 
 Only surfaces and blobs with a normal vector pointing towards the camera view
 are shown in the 2-dimensional projection. In order to avoid data at very acute
@@ -70,7 +70,7 @@ and 2D surface mesh data is accessed via the `get_mesh()` method.
 
 A 2D view of blob data is stored in the `BlobsFrame()` class, with the attributes
 - `n`: number of blobs in frame
-- `points`: (2x$n$) array of 2-dimensional coordinates
+- `points`: (2x $n$) array of 2-dimensional coordinates
 - `diameters`: ndarray of blob diameters.
 
 This class can be extended to include additional blob data extracted from image
