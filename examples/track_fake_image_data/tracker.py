@@ -22,6 +22,7 @@ Loop:
 import pickle
 import sys
 import numpy as np
+from scipy.linalg import expm
 from matplotlib import pyplot as plt
 
 from motiontrack.sample_bodies.cube import make_cube
@@ -35,9 +36,12 @@ from motiontrack.plot import PlotMatch, PlotTrack
 
 from kalmanfilter.ekf import ExtendedKalmanFilter
 from kalmanfilter.process_noise import custom_process_noise
+from kalmanfilter.rts_smoother import rts_smoother
 
 sys.path.insert(1, 'classes/')
 from blob_track_observable import BlobTrack6DoF
+
+from filterpy.kalman import KalmanFilter as EKF
 
 CONFIG = 'data/system_config_errors'
 #  CONFIG = 'data/system_config'
@@ -95,13 +99,18 @@ def test_tracking_loop(print_flag=0, debug=False):
     # Define filter
     # ---------------------------------------------------------------------
     #  P0 = np.ones((dsys.get_nx(), dsys.get_nx()))*10
-    P0 = np.eye(dsys.get_nx())*1
+    P0 = np.eye(dsys.get_nx())*1000
+    #  P0 = np.ones((dsys.get_nx(), dsys.get_nx()))*100 + np.eye(dsys.get_nx())*1000
 
     x0 = dsys.load_x_0(CONFIG)
-    ekf = ExtendedKalmanFilter(dsys, 0.1, quaternions=True)
+    ekf = ExtendedKalmanFilter(dsys, 0.1, quaternions=False)
     ekf.initialise(x0, P=P0)
-    Q_c = np.zeros((13,13))
+    Q_c = np.ones((13,13))*0.01
     Q_c[7:13,7:13] = np.eye(6)
+
+    fp = EKF(13,7)
+    fp.x = x0
+    fp.P = P0
 
     # ---------------------------------------------------------------------
     # Load true data for compairson
@@ -114,12 +123,22 @@ def test_tracking_loop(print_flag=0, debug=False):
     # Main tracking loop
     # ---------------------------------------------------------------------
     x_history = []
+    P_history = []
+    F_history = []
+    Q_history = []
     x_pr_history = []
+    P_pr_history = []
     t_history = []
     y_history = []
 
+    x_fp_history = []
+    P_fp_history = []
+
     t = 0
     x = x0
+    P = P0
+    t_next, ob_next_group, nz = get_next_obs_group(obs_list, t, 0.0001)
+    y, R = get_all_measurements(ob_next_group, x0, dsys.x_dict)
     t_next, ob_next_group, nz = get_next_obs_group(obs_list, t, 0.0001)
     while t_next < np.inf:
         dt = t_next - t
@@ -127,22 +146,54 @@ def test_tracking_loop(print_flag=0, debug=False):
         # Jacobian matrix, and process noise.
         hx = create_observable_function(ob_next_group, dsys.x_dict)
         A = dsys.J_np(x,[])
-        H = ekf.create_H_jacobian(x, nz, hx, dt)
-        Q = custom_process_noise(A, Q_c, dt, 500)
-        breakpoint()
+        Q = custom_process_noise(A, Q_c, dt, 200)
+        #  Q= np.eye(13)*10
 
         # Predict
-        x_pr = ekf.predict(dt, Q)
+        x_priori, P_priori, F_priori = ekf.predict(dt, Q)
+        #TODO - get a-priori covariance estimate
+        #  x_pr = F@x
 
-        # Update
-        y, R = get_all_measurements(ob_next_group, x_pr, dsys.x_dict)
-        x, P = ekf.update(y, R, hx, H)
+        #  print(x_pr1)
+        #  print(x_pr)
+        H = ekf.create_H_jacobian(x_priori, nz, hx, dt)
 
-        # store results
-        x_history.append(x)
-        x_pr_history.append(x_pr)
+        # Get measurements
+        y, R = get_all_measurements(ob_next_group, x_priori, dsys.x_dict)
+
+        # Store results
         t_history.append(t_next)
         y_history.append(y)
+        x_pr_history.append(x_priori)
+        P_pr_history.append(P_priori)
+
+        # Update
+        x, P = ekf.update(y, R, hx, H)
+        x_history.append(x.copy())
+        P_history.append(P.copy())
+        Q_history.append(Q)
+        F_history.append(F_priori)
+
+        def Hjacobian(x_):
+            return ekf.create_H_jacobian(x_,nz,hx,dt)
+
+        fp.Q = Q
+        fp.F = F_priori
+        fp.R = R
+        fp.H = H
+
+        # Filterpy predict
+        def predict_x(u):
+            return np.array(x_pr).copy()
+
+        fp.predict_x = predict_x
+
+        fp.predict()
+        # Filterpy update
+        fp.update(y, R, H)
+
+        x_fp_history.append(fp.x)
+        P_fp_history.append(fp.P)
 
         # Get next measurement time and observation group
         t = t_next
@@ -152,23 +203,47 @@ def test_tracking_loop(print_flag=0, debug=False):
         plot_track.update_state(x_history, t_history)
         #  plot_track.update_priori(x_pr_history, t_history)
         plot_track.update_observation(y_history, t_history)
+        #  input("Press to update")
+        #  plot_track.update_state(x_fp_history, t_history)
 
         print('Step no:',len(t_history),'complete')
         if debug:
             print("A priori:")
-            print(x_pr)
+            print(x_priori)
             print("Tracked:")
             print(x)
             print("True:")
             print(true_data[len(t_history)-1,:])
             print("dt = ",dt)
-
+            print("P = ")
+            print(P)
             input("Press key for next step")
 
     plot_t.close()
     plot_e.close()
 
-    input("Press key to close figures")
+    x_rts, P_rts = rts_smoother(x_history,
+                                P_history,
+                                x_pr_history,
+                                P_pr_history,
+                                F_history,
+                                Q_history)
+
+    #  breakpoint()
+
+    #  from filterpy.kalman import KalmanFilter
+    #  kf = KalmanFilter(13,7)
+    #  x_rts, P_rts, _, _ = fp.rts_smoother(np.array(x_history),
+                               #  np.array(P_history),
+                               #  np.array(F_history),
+                               #  np.array(Q_history))
+
+    plot_track.load_smoothed_data(x_rts, t_history)
+
+    #  plot_track.load_smoothed_data(x_rts, t_history)
+
+    breakpoint()
+    #  input("Press key to close figures")
     plot_track.close()
 
     x_history = np.array(x_history)

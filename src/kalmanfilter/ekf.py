@@ -214,19 +214,18 @@ class ExtendedKalmanFilter():
         dt : float
             Time-step.
         """
-        if dt == 0:
-            dt = 1e-8
-        x0 = self.x
-        x1 = self._fx(x0,dt)
-        z0 = hx(x)
+        dx = 1e-3
+
+        x0 = x.copy()
+        #  x1 = self._fx(x0,dt)
+        z0 = hx(x0)
 
         H = np.empty((n_z, len(x0)))
-        for i, x_i in enumerate(x1):
+        for i in range(len(x0)):
             xd_i = x0.copy()
-            xd_i[i] = x1[i]
-            dx = x_i - x[i]
-            dz = (hx(xd_i)-z0)/dx
-            H[:,i] = dz
+            xd_i[i] += dx
+            dzdx = (hx(xd_i)-z0)/dx
+            H[:,i] = dzdx
         return H
 
     def predict(self,
@@ -245,7 +244,8 @@ class ExtendedKalmanFilter():
         Q : np.array
             Process noise matrix
         """
-        J = self.dsys.J_np(self.x, [])
+        x_priori = self._fx(self.x, dt)
+        J = self.dsys.J_np(x_priori, [])
         self.F = expm(J*dt)
         self.x = self._fx(self.x, dt)
         self.Q = Q
@@ -254,7 +254,8 @@ class ExtendedKalmanFilter():
         # save prior
         self.x_prior = np.copy(self.x)
         self.P_prior = np.copy(self.P)
-        return self.x_prior
+        self.F_priori = np.copy(self.F)
+        return self.x_prior, self.P_prior, self.F_priori
 
     def update(self,
                y: np.array,
@@ -285,6 +286,7 @@ class ExtendedKalmanFilter():
         PHT = self.P@H.T #np.dot(self.P, H.T)
         self.R = R
         self.S = H@PHT + R
+        #  breakpoint()
         self.SI = linalg.inv(self.S)
         self.K = np.dot(PHT, self.SI)
 

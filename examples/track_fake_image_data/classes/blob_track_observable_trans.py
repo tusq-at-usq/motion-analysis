@@ -21,7 +21,7 @@ class BlobTrack6DoF(ObservationGroup):
                  plots: List[PlotMatch],
                  frame_rate: float):
         name = "blob_track_observable"
-        ob_names = ["x", "y", "z", "q0", "q1", "q2", "q3"]
+        ob_names = ["x", "y", "z"]
         super().__init__(name=name,
                          size=7,
                          ob_names=ob_names)

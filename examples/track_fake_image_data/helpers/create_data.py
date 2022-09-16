@@ -32,7 +32,7 @@ dsys.add_aug_states(CONFIG)
 dsys.sub_params(CONFIG)
 dsys.lambdify()
 x_0 = dsys.load_x_0(CONFIG)
-x_history, t_history = dsys.integrate(5.0,x_0,dt_max=0.02)
+x_history, t_history = dsys.integrate(2,x_0,dt_max=0.02)
 pos_history = x_history[:,0:3]
 q_history = x_history[:,3:7]
 
