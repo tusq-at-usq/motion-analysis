@@ -247,15 +247,15 @@ class ExtendedKalmanFilter():
         x_priori = self._fx(self.x, dt)
         J = self.dsys.J_np(x_priori, [])
         self.F = expm(J*dt)
-        self.x = self._fx(self.x, dt)
+        self.x = x_priori
         self.Q = Q
         self.P = self.F@self.P@self.F.T + self.Q
 
         # save prior
         self.x_prior = np.copy(self.x)
         self.P_prior = np.copy(self.P)
-        self.F_priori = np.copy(self.F)
-        return self.x_prior, self.P_prior, self.F_priori
+        self.F = np.copy(self.F)
+        return self.x_prior, self.P_prior, self.F
 
     def update(self,
                y: np.array,

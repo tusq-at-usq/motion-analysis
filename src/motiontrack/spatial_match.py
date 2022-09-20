@@ -62,12 +62,11 @@ class SpatialMatch:
             D_d = D_ds_unfilt[i]
 
             # Update model and views
-            p = np.array(p0) + view.offset 
+            p = np.array(p0)
             self.B.update(p,Q0)
             p_p = view.get_blobs().points.T
 
-            D = np.array(D_d)*view.scale # Diameters from image
-            p_p = p_p * view.scale # Blob vectors from projection
+            D = np.array(D_d) # Diameters from image
             p_d = np.array([X_d,Y_d]).T # Blob vectors from measured data
 
             # Find the distancer between each combination of blobs
@@ -96,14 +95,12 @@ class SpatialMatch:
                 D_d = D_ds[i]
 
                 ps = p0 * C[4:7]
-                ps = ps + view.offset
                 self.B.update(ps,Qs)
                 blobs = view.get_blobs()
                 p_p = blobs.points
 
                 blob_map = []
                 min_norms = []
-                p_p = p_p*view.scale
                 for x,y,d in zip(X_d,Y_d,D_d): # Iterate through image blobs
                     # TODO: It wold be better to construct a matrix of distances
                     # and start from the closest blob. Instead of starting with 
