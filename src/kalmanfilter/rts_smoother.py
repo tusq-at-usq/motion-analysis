@@ -22,8 +22,12 @@ def rts_smoother(xs: List[np.array],
         - The a-priori state and covariance: x_(k/k-1), P_(k/k-1)
         - The state transition matrix based off the a-priori state F(x_(k/k-1))
         - The process noise matrix Q_k
-
     Therefore, all input lists should be the same length
+
+    The smoothed state and covarinace is described by
+    C_k = P_(k/k) F(k+1).T P(k+1/k)^-1
+    x_(k/n) = x_(k/k) + C_k*(x_(k+1/n) - x_(k_1/k))
+    P_(k/n) = P_(k/k) + C_k*(P_(k+1/n) - P_(k_1/k)) C_k.T
 
     Parameters
     ----------

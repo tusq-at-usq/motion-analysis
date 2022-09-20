@@ -2,6 +2,8 @@
 
 """ Set of quatnerion opreation functions
     Quaternion order is q = {a1 + bj + cw + d}
+
+    Note these should be checked for accuracy before use.
 """
 
 import numpy as np

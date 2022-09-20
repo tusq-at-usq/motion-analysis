@@ -33,7 +33,7 @@ def custom_process_noise(A: np.array,
         Discrete-time process noise matrix
     """
     def _eval(ts):
-        res = [] 
+        res = []
         for t in ts:
             res.append(expm(A*t)@(Q_c*density)@expm(A*t).T)
         return np.moveaxis(res, 0, 2)
