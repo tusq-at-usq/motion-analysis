@@ -43,15 +43,15 @@ States:
   p:
     Min: -1.0
     Max: 1.0
-    X0: 1.0
+    X0: 0.5
   q:
     Min: -1.0
     Max: 1.0
-    X0: 3.0
+    X0: 1.0
   r:
     Min: -1.0
     Max: 1.0
-    X0: 2.0
+    X0: 3.0
 Parameters:
   I_13:
     Type: Param
@@ -95,6 +95,6 @@ Parameters:
     Max: '-'
   cross-wind:
     Type: Param
-    X0: 50.0
+    X0: 0.0
     Min: '-'
     Max: '-'

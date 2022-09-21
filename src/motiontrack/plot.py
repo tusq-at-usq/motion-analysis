@@ -226,5 +226,31 @@ class PlotTrack:
 
         self.app.processEvents()
 
+    def load_smoothed_data(self, x_smoothed, t):
+        x_smoothed = np.array(x_smoothed).T
+        t = np.array(t)
+        pen = pg.mkPen(15, width=1)
+
+        self.p1.plot(t, x_smoothed[self.x_dict['x']], pen=pen)
+        self.p1.plot(t, x_smoothed[self.x_dict['y']], pen=pen)
+        self.p1.plot(t, x_smoothed[self.x_dict['z']], pen=pen)
+
+        self.p2.plot(t, x_smoothed[self.x_dict['q0']],pen=pen)
+        self.p2.plot(t, x_smoothed[self.x_dict['q1']],pen=pen)
+        self.p2.plot(t, x_smoothed[self.x_dict['q2']],pen=pen)
+        self.p2.plot(t, x_smoothed[self.x_dict['q3']],pen=pen)
+
+        self.p3.plot(t, x_smoothed[self.x_dict['u']], pen=pen)
+        self.p3.plot(t, x_smoothed[self.x_dict['v']], pen=pen)
+        self.p3.plot(t, x_smoothed[self.x_dict['w']], pen=pen)
+
+        self.p4.plot(t, x_smoothed[self.x_dict['p']], pen=pen)
+        self.p4.plot(t, x_smoothed[self.x_dict['q']], pen=pen)
+        self.p4.plot(t, x_smoothed[self.x_dict['r']], pen=pen)
+
+        self.app.processEvents()
+
+
+
     def close(self):
         self.view.close()

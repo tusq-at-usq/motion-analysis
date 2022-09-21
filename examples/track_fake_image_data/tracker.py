@@ -68,8 +68,8 @@ def test_tracking_loop():
     Q = euler_to_quaternion(0, 0, 0)
     body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
 
-    view_t = View(body, np.array([-np.pi/2,0.00000,0.000000]), "top", "top")
-    view_e = View(body, np.array([0, 0, np.pi/2]), "east", "east")
+    view_t = View(body, np.array([-np.pi/2,0.00000,0.000000]), "top")
+    view_e = View(body, np.array([0, 0, np.pi/2]), "east")
 
     # ---------------------------------------------------------------------
     # Define dynamic system

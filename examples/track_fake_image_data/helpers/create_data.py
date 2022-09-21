@@ -18,8 +18,8 @@ body = make_cube()
 Q = euler_to_quaternion(0, 0, 0)
 body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
 
-view_1 = View(body, np.array([-np.pi/2,0.00000,0.000000]), "top", "top")
-view_2 = View(body, np.array([0, 0, np.pi/2]), "east", "east")
+view_1 = View(body, np.array([-np.pi/2,0.00000,0.000000]), "top")
+view_2 = View(body, np.array([0, 0, np.pi/2]), "east")
 
 # ---------------------------------------------------------------
 # Create dynamic system data

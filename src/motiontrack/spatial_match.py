@@ -5,6 +5,10 @@
 Code to match location (x,y,z) and orientation (q0, q1, q2, q3) of an object
 using blob location from data, and a model of the object.
 
+Note this code is in 'draft' format. 
+
+Both the code and algorithm could be significantly improved.
+
 Author: Andrew Lock
 Created: 30/5/22
 """
