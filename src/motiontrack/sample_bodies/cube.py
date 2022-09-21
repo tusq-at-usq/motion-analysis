@@ -3,8 +3,8 @@
 
 import os
 import numpy as np
-from motiontrack.geometry_stl import BodySTL
-
+#  from motiontrack.geometry_stl import BodySTL
+from motiontrack.geometry import BodySTL
 
 STL_PATH = os.path.join(os.path.dirname(__file__), 'data/cube.stl')
 
