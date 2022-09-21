@@ -6,8 +6,9 @@ import numpy as np
 
 from motiontrack.custom_types import ObservationGroup
 
-def get_all_measurements(obs: List[ObservationGroup], x_pr: np.array, x_dict: dict)\
-        -> Tuple[np.array, np.array]:
+def get_all_measurements(obs: List[ObservationGroup],
+                         x_pr: np.array,
+                         x_dict: dict) -> Tuple[np.array, np.array]:
     """
     Get measurements from multiple groups
 
