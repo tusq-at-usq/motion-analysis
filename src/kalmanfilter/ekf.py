@@ -150,9 +150,13 @@ class ExtendedKalmanFilter():
         self.x_post = self.x.copy()
         self.P_post = self.P.copy()
 
-    def _fx(self,X,dt):
+    def _fx(self,X, u, dt):
         # Note: Inputs not yet supported
-        X_, t_ = self.dsys.integrate(dt, X, dt_max=self.dt_int_max)
+        X_, t_ = self.dsys.integrate(dt,
+                                     X,
+                                     dt_max=self.dt_int_max,
+                                     u_funs = u,
+                                     input_type = 'constant')
         return X_[-1,:]
 
     def initialise(self,
@@ -198,6 +202,7 @@ class ExtendedKalmanFilter():
 
     def create_H_jacobian(self,
                            x: np.array,
+                           u: np.array,
                            n_z: int,
                            hx: Callable,
                            dt: float):
@@ -211,26 +216,29 @@ class ExtendedKalmanFilter():
         ----------
         x : np.array
             Current state
+        u : np.array
+            Current state
         dt : float
-            Time-step.
+            Time-step. NOTE: Currently not used
         """
         dx = 1e-3
 
         x0 = x.copy()
         #  x1 = self._fx(x0,dt)
-        z0 = hx(x0)
+        z0 = hx(x0, u)
 
         H = np.empty((n_z, len(x0)))
         for i in range(len(x0)):
             xd_i = x0.copy()
             xd_i[i] += dx
-            dzdx = (hx(xd_i)-z0)/dx
+            dzdx = (hx(xd_i, u)-z0)/dx
             H[:,i] = dzdx
         return H
 
     def predict(self,
                 dt: float,
-                Q: np.array):
+                Q: np.array,
+                u = np.array([])):
         """
         Predict next state (prior) using the Kalman filter state propagation
         equations.
@@ -244,8 +252,8 @@ class ExtendedKalmanFilter():
         Q : np.array
             Process noise matrix
         """
-        x_priori = self._fx(self.x, dt)
-        J = self.dsys.J_np(x_priori, [])
+        x_priori = self._fx(self.x, u, dt)
+        J = self.dsys.J_np(x_priori, u)
         self.F = expm(J*dt)
         self.x = x_priori
         self.Q = Q
@@ -262,6 +270,7 @@ class ExtendedKalmanFilter():
                R: np.array,
                _hx: Callable,
                H: np.array,
+               u: np.array = np.array([]),
                residual: Callable=np.subtract):
         """ Performs the update innovation of the extended Kalman filter.
         Parameters
@@ -276,6 +285,8 @@ class ExtendedKalmanFilter():
         Hx : np.array
            function which computes the Jacobian of the H matrix (measurement
            function). Takes state variable (self.x) as input, returns H.
+        u : np.array, optional
+            Input vector
         residual : function (z, z2), optional
             Optional function that computes the residual (difference) between
             the two measurement vectors. If you do not provide this, then the
@@ -290,7 +301,7 @@ class ExtendedKalmanFilter():
         self.SI = linalg.inv(self.S)
         self.K = np.dot(PHT, self.SI)
 
-        hx = _hx(self.x)
+        hx = _hx(self.x, u)
         res = residual(y, hx)
         self.x = self.x + np.dot(self.K, res)
 
