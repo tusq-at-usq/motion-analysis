@@ -24,7 +24,7 @@ from matplotlib import pyplot as plt
 from filterpy.common import Q_continuous_white_noise
 from motiontrack.combine_observables import get_all_measurements,\
     create_observable_function, get_next_obs_group
-from motiontrack.ukf import UKF
+from kalmanfilter.ekf import ExtendedKalmanFilter
 
 sys.path.insert(1, 'classes/')
 from position_observable import Position2D
@@ -63,7 +63,7 @@ def test_tracking_loop(print_flag=0):
     # ---------------------------------------------------------------------
     P0 = np.eye(dsys.get_nx())*2
     x0 = dsys.load_x_0(CONFIG)
-    ukf = UKF(dsys, 0.1)
+    ukf = ExtendedKalmanFilter(dsys, 0.1)
     ukf.initialise(x0, P=P0)
 
     # ---------------------------------------------------------------------

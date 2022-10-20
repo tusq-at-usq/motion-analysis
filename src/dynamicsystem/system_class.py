@@ -12,7 +12,7 @@ g = observable functions g(x,P) [optional]
 
 import os
 import pickle
-from typing import List, Tuple
+from typing import List, Tuple, Union, Callable
 import numpy as np
 import yaml
 import sympy as sp
@@ -34,11 +34,14 @@ class DynamicSystem:
 
         self.state_dict = {k: v for k, v in self.sym_dict.items() if k in X}
         self.param_dict = {k: v for k, v in self.sym_dict.items() if k in P}
+        self.input_dict = {}
         self.sym_dict_inv = {v: k for k, v in sym_dict.items()}
         self.state_dict_inv = {v: k for k, v in self.state_dict.items()}
         self.param_dict_inv = {v: k for k, v in self.param_dict.items()}
+        self.input_dict_inv = {}
 
         self.x_dict = {name:i for i,name in enumerate(self.state_dict.values())}
+        self.u_dict = {}
 
         self.f_np = []
 
@@ -60,7 +63,7 @@ class DynamicSystem:
             pickle.dump(self,file)
 
     def write_default_config(self, config_name: str):
-        """/docum
+        """
         Write default configuration file
 
         Default configuration file is populated with default values.
@@ -170,6 +173,36 @@ class DynamicSystem:
         for i in range(len(self.f)):
             self.f[i] = self.f[i].subs(aug_states_sub)
 
+    def add_inputs(self, config_name: str):
+        """
+        Add inputs from config
+
+        Adds augmented states to the dynamic system from the config file
+        for use with Koopman linearised systems.
+        Augmented states are indicated by 'Aug_state' type in the config file'
+
+        Parameters
+        ----------
+        config_name : str
+            Name of config file ('.yaml' is automatically appended)
+        """
+        _, _, inputs, _ = self.load_config(config_name)
+        inputs_sub = []
+        for i in range(len(inputs)):
+            u_ = sp.Symbol("u"+str(i))
+            self.input_dict[u_] = list(inputs.keys())[i]
+            inputs_sub.append((self.sym_dict_inv[list(inputs.keys())[i]],u_))
+            self.U.append(u_)
+        self.input_dict_inv = {v: k for k, v in self.input_dict.items()}
+        # Re-name augmented states 'u<i>' in dynamics equations and parameter
+        # list
+        for i in range(len(self.f)):
+            self.f[i] = self.f[i].subs(inputs_sub)
+        for i in range(len(self.P)):
+            self.P[i] = self.P[i].subs(inputs_sub)
+        # Create dictionary of input order
+        self.u_dict = {name:i for i,name in enumerate(self.input_dict.values())}
+
     def sub_params(self, config_name: str):
         """
         Substitute parameter values into dynamic equations.
@@ -180,11 +213,16 @@ class DynamicSystem:
         config_name : str
             Name of config file ('.yaml' is automatically appended)
         """
+
+        # Handle fixed parameters
         _, params, inputs, _ = self.load_config(config_name)
         param_subs = [(self.sym_dict_inv[P[0]],P[1]) for P in params.items()]
-        self.U = [self.sym_dict_inv[ui] for ui in inputs]
         for i in range(len(self.f)):
             self.f[i] = self.f[i].subs(param_subs)
+
+        # Handle inputs
+        #  self.U = [self.sym_dict_inv[ui] for ui in inputs]
+
         self.J = self._create_jacobian()
         return
 
@@ -240,14 +278,15 @@ class DynamicSystem:
         return x_
 
     def _create_jacobian(self):
-        J = sp.Matrix(self.f).jacobian(self.X+self.U)
+        J = sp.Matrix(self.f).jacobian(self.X)
         return J
 
     def integrate(self,
                   t_end: float,
                   x_0: np.array,
-                  u_funs: list = [],
-                  dt_max:float = 0.01) -> Tuple[np.array, np.array]:
+                  u_funs: Union[List[Callable], np.array] = [],
+                  dt_max: float = 0.01,
+                  input_type: str = 'function') -> Tuple[np.array, np.array]:
         """
         Time-integrate function
 
@@ -262,8 +301,12 @@ class DynamicSystem:
             Initial state vector
         u_funs : list
             List of functions u(t) which return the input value for each time
-        dt_max : float
+        dt_max : float, optional (default = 0.01)
             Maximum integration time-step
+        input_type : str, optional (default = 'function')
+            Type of input. Options are 'function' where u(t), or 'constant'
+            for which u(t) is a 1-d numpy array and is constant over the
+            integration horizon
 
         Returns
         -------
@@ -279,17 +322,19 @@ class DynamicSystem:
         x_history = [x]
         t = 0
         t_history = [t]
+        if input_type == 'function':
+            def get_u(t):
+                return np.array([u_i(t) for u_i in u_funs])
+        elif input_type == 'constant':
+            def get_u(_):
+                return u_funs
+
+        # TODO: Avoid appending to list, replace with 2-d arrays
         for _ in range(steps):
-            u = np.array([u_i(t) for u_i in u_funs])
+            u = get_u(t)
             x = self.step(dt, x, u)
             x_history.append(x)
             t = t + dt
             t_history.append(t)
         return np.array(x_history), np.array(t_history)
-
-        #TODO: Input function to load input functions/data
-
-
-
-
 

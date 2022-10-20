@@ -30,7 +30,7 @@ class ObservationGroup:
         self.name = name
         self.size = size
         self.ob_names = ob_names
-        self.index = -1
+        self.index = 0
         self.z_history = []
         self.y_history = []
         self.t_history = []
@@ -64,7 +64,7 @@ class ObservationGroup:
         return 0
 
     # <Override>
-    def _create_ob_fn(self, x_dict: dict) -> Callable:
+    def _create_ob_fn(self, x_dict: dict, u_dict: dict) -> Callable:
         """ Placeholder function to get observables from state vector.
         State vector variables are refereced by dictionary key.
         """
@@ -95,15 +95,17 @@ class ObservationGroup:
         t_next = self._get_next_t()
         return t_next
 
-    def create_ob_fn(self, x_dict: dict) -> Callable:
+    def create_ob_fn(self, x_dict: dict, u_dict: dict) -> Callable:
         """
         Create an observable function used in the Kalman filter,
         of the form z = h(x)
 
         Parameters
         ----------
-        x_list : dict
+        x_dict : dict
             Dictionary of state values in format {'name':value}
+        u_dict : dict
+            Dictionary of input values in format {'name':value}
 
         Returns
         -------
@@ -111,7 +113,7 @@ class ObservationGroup:
             Observable function z = h(x)
         """
 
-        hx = self._create_ob_fn(x_dict)
+        hx = self._create_ob_fn(x_dict, u_dict)
         return hx
 
     def residual(self,y1,y0):

@@ -35,7 +35,7 @@ def test_spatial_match(print_flag=0):
     body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
 
     V_t = View(body, np.array([np.pi/2,0.,0.]),'top') # View from top
-    V_e = View(body,np.array([0, 0, np.pi/2]),"east",'test',0)
+    V_e = View(body,np.array([0, 0, np.pi/2]),"east")
 
     EA = np.full(3,-np.pi) +  np.random.rand(3)*2*np.pi # Random Euler angles
 

@@ -5,7 +5,7 @@ from typing import List
 import numpy as np
 from motiontrack.custom_types import ObservationGroup
 from motiontrack.body_projection import View
-from motiontrack.geometry_stl import BodySTL
+from motiontrack.geometry import BodySTL
 from motiontrack.blob_data import read_blob_data
 from motiontrack.spatial_match import SpatialMatch
 from motiontrack.plot import PlotMatch

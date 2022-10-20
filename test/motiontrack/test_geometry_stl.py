@@ -32,9 +32,7 @@ def load_stl(trigger_start=False):
     X1 = np.linspace(0,50,100)
 
     view_t = View(body,np.array([-np.pi/2,0.0,0.0]),"top",'test',0)
-    #  V = View(body,np.array([np.pi, 0, np.pi/2]),"west",'test',0)
     view_e = View(body,np.array([0, 0, np.pi/2]),"east",'test',0)
-    #  V = View(body,np.array([np.pi/2, 0, np.pi/2]),"front",'test',0)
     views = [view_t, view_e]
 
     plot_t = PlotMatch('Top')

@@ -13,7 +13,9 @@ def rts_smoother(xs: List[np.array],
                  x_prs: List[np.array],
                  P_prs: List[np.array],
                  Fs: List[np.array],
-                 Qs: List[np.array]):
+                 Qs: List[np.array],
+                 quaternions = False,
+                 x_dict = {}):
     """
     Rauch–Tung–Striebel smoothing on batch-processed Kalman filter results
 
@@ -45,6 +47,17 @@ def rts_smoother(xs: List[np.array],
         List of d-dimensional process noise matrices
     """
 
+    if quaternions:
+        q_inds =  np.array([x_dict[q_x] for q_x in ['q0', 'q1', 'q2', 'q3']])
+        if len(q_inds) not in [0,4]:
+            print("ERROR:",len(q_inds),"quaternions identifiead")
+        def _normalise_q(x):
+            q_raw = x[q_inds]
+            q_norm = q_raw / np.linalg.norm(q_raw)
+            for q_i,q_ind in zip(q_norm,q_inds):
+                x[q_ind] = q_i
+            return x
+
     n = len(xs)
     if not all(n_i == n for n_i in [len(Ps), len(Fs), len(Qs), len(x_prs), len(P_prs)]):
         print("ERROR: RTS smoother inputs are not same length")
@@ -56,5 +69,7 @@ def rts_smoother(xs: List[np.array],
     for k in range(n-2, -1, -1):
         C = Ps[k]@(Fs[k+1].T)@np.linalg.inv(P_prs[k+1])
         x_rts[k] = xs[k] + C@(x_rts[k+1] - x_prs[k+1])
+        if quaternions:
+            x_rts[k] = _normalise_q(x_rts[k])
         P_rts[k] = Ps[k] + C@(P_rts[k+1] - P_prs[k+1])@(C.T)
     return x_rts, P_rts

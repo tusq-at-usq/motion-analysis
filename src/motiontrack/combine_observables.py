@@ -40,12 +40,13 @@ def get_all_measurements(obs: List[ObservationGroup],
         R = np.eye(len(tau_all))*tau_all
     return y_all, R
 
-def create_observable_function(obs: List[ObservationGroup], x_dict: dict)\
-        -> np.array:
+def create_observable_function(obs: List[ObservationGroup],
+                               x_dict: dict,
+                               u_dict: dict) -> np.array:
     """
-    Create combined observabel function
+    Create combined observable function
 
-    Creates a combined observanle function from all observable groups
+    Creates a combined observable function from all observable groups
     for the next update time.
 
     Parameters
@@ -54,16 +55,18 @@ def create_observable_function(obs: List[ObservationGroup], x_dict: dict)\
         List of ObservationGroup instances to use for observation
     x_dict : dict
         Dictionary of states in state vector, in form {<name>:index}
+    u_dict : dict
+        Dictionary of inputs in state input, in form {<name>:index}
 
     Returns
     -------
     hx : Callable
         Combined observable function
     """
-    hx_groups = [ob.create_ob_fn(x_dict) for ob in obs]
+    hx_groups = [ob.create_ob_fn(x_dict, u_dict) for ob in obs]
 
-    def hx(x: np.array):
-        z = [hx_i(x) for hx_i in hx_groups]
+    def hx(x: np.array, u: np.array):
+        z = [hx_i(x, u) for hx_i in hx_groups]
         z = np.array(np.concatenate(z).flat)
         return z
     return hx
@@ -110,6 +113,7 @@ def get_next_obs_group(obs_all: List[ObservationGroup], t: float, dt_min: float)
     nz : int
         Number of observables
     """
+
     ts = []
     for ob in obs_all:
         ts.append(ob.get_next_t())

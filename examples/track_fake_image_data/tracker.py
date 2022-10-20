@@ -58,6 +58,7 @@ BLOB_FILES = ['data/view_1_data.csv', 'data/view_2_data.csv']
 TRUE_DATA = 'data/true.csv'
 TRUE_TIME = 'data/time.csv'
 
+#  A = np.update_observation
 
 def test_tracking_loop():
 
@@ -110,7 +111,7 @@ def test_tracking_loop():
     Q_c = np.zeros((dsys.get_nx(),dsys.get_nx()))
     Q_c[7:13,7:13] = np.eye(6) # Process noise in continuous time
 
-    ekf = ExtendedKalmanFilter(dsys, 0.1, quaternions=False)
+    ekf = ExtendedKalmanFilter(dsys, 0.1, quaternions=True)
     ekf.initialise(x0, P=P0)
 
     # ---------------------------------------------------------------------

@@ -171,9 +171,9 @@ class PlotTrack:
         self.v.setData(t, x[self.x_dict['v']])
         self.w.setData(t, x[self.x_dict['w']])
 
-        self.p.setData(t, x[self.x_dict['p']])
-        self.q.setData(t, x[self.x_dict['q']])
-        self.r.setData(t, x[self.x_dict['r']])
+        #  self.p.setData(t, x[self.x_dict['a_x']])
+        #  self.q.setData(t, x[self.x_dict['a_y']])
+        #  self.r.setData(t, x[self.x_dict['a_z']])
 
         self.app.processEvents()
 
@@ -198,10 +198,10 @@ class PlotTrack:
             self.y_pr.setData(t, x[1])
             self.z_pr.setData(t, x[2])
 
-            self.q0_pr.setData(t, x[3])
-            self.q1_pr.setData(t, x[4])
-            self.q2_pr.setData(t, x[5])
-            self.q3_pr.setData(t, x[6])
+            #  self.q0_pr.setData(t, x[3])
+            #  self.q1_pr.setData(t, x[4])
+            #  self.q2_pr.setData(t, x[5])
+            #  self.q3_pr.setData(t, x[6])
 
     def load_true_data(self, x_true, t):
         x_true = np.array(x_true).T
@@ -244,13 +244,12 @@ class PlotTrack:
         self.p3.plot(t, x_smoothed[self.x_dict['v']], pen=pen)
         self.p3.plot(t, x_smoothed[self.x_dict['w']], pen=pen)
 
-        self.p4.plot(t, x_smoothed[self.x_dict['p']], pen=pen)
-        self.p4.plot(t, x_smoothed[self.x_dict['q']], pen=pen)
-        self.p4.plot(t, x_smoothed[self.x_dict['r']], pen=pen)
+        #  self.p4.plot(t, x_smoothed[self.x_dict['a_x']], pen=pen)
+        #  self.p4.plot(t, x_smoothed[self.x_dict['a_y']], pen=pen)
+        #  self.p4.plot(t, x_smoothed[self.x_dict['a_z']], pen=pen)
 
         self.app.processEvents()
 
 
-
     def close(self):
-        self.view.close()
+        self.win.close()

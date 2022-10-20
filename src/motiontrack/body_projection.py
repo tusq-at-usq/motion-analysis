@@ -31,7 +31,7 @@ import pyqtgraph as pg
 
 from motiontrack.utils import euler_to_quaternion, quaternions_to_rotation_tensor
 from motiontrack.blob_data import BlobsFrame
-from motiontrack.geometry_stl import BodySTL
+from motiontrack.geometry import BodySTL
 
 class View:
     # A projection of the 3D local coordinates to a specific 2D direction

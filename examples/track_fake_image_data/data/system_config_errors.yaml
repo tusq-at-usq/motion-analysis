@@ -85,7 +85,7 @@ Parameters:
     Max: '-'
   drag_coef:
     Type: Param
-    X0: 0.8
+    X0: 0.5
     Min: '-'
     Max: '-'
   I_2:
@@ -95,6 +95,6 @@ Parameters:
     Max: '-'
   cross-wind:
     Type: Param
-    X0: 50.0
+    X0: 0.0
     Min: '-'
     Max: '-'
