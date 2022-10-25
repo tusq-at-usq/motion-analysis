@@ -30,13 +30,13 @@ def quaternion_to_rotation_tensor(q0: float, q1: float, q2: float, q3: float,
             [q0**2+q1**2-q2**2-q3**2,  2*(q1*q2+q0*q3),  2*(q1*q3-q0*q2) ],
             [2*(q1*q2-q0*q3),  q0**2-q1**2+q2**2-q3**2,  2*(q2*q3+q0*q1) ],
             [2*(q1*q3+q0*q2),  2*(q2*q3-q0*q1),  q0**2-q1**2-q2**2+q3**2 ]
-            ]) # Eqn 10.14 from Zipfel
+            ]).T # Eqn 10.14 from Zipfel
     elif package == 'sympy':
         T_rot = sp.Matrix([
             [q0**2+q1**2-q2**2-q3**2,  2*(q1*q2+q0*q3),  2*(q1*q3-q0*q2) ],
             [2*(q1*q2-q0*q3),  q0**2-q1**2+q2**2-q3**2,  2*(q2*q3+q0*q1) ],
             [2*(q1*q3+q0*q2),  2*(q2*q3-q0*q1),  q0**2-q1**2-q2**2+q3**2 ]
-            ]) 
+            ]).T
     else:
         return ValueError("Package type not recognised")
     return T_rot
@@ -136,9 +136,10 @@ def quaternion_subtract(q0: np.array, q_sub: np.array) -> np.array:
     Q_diff = Q0 * np.linalg.inv(Q_sub)
     return Q_diff[:,0]
 
+#  def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
 def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
     """
-    Euler angles to quaternions
+    Euler angles to quaternion
 
     According to Zipfel Eqn. 10.12
     Quaternion order is q = {a1 + bi + cj + k}.
@@ -156,7 +157,7 @@ def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
     Returns
     -------
     q0, q1, q2, q3 : List[float]
-        Equivalent quaternions
+        Equivalent quaternion
     """
     q0 = np.cos(psi/2) * np.cos(theta/2) * np.cos(phi/2) \
         + np.sin(psi/2) * np.sin(theta/2) * np.sin(phi/2)
