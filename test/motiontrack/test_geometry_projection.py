@@ -48,7 +48,22 @@ def show_camera_viewpoints():
     body.plot()
     input("Press to close")
 
+def test_manual_rotation():
+    body = make_cube()
+    Q = euler_to_quaternion(0, 0, 0)
+    body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
+    body.plot()
+    input("Rotate and press any key")
+    q_rot = body.get_camera_angle()
+    body = make_cube()
+    Q = euler_to_quaternion(0, 0, 0)
+    body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
+    body.update([0,0,0], q_rot)
+    body.plot()
+    input("Confirm view is similar")
+
 if __name__=='__main__':
 
     show_camera_viewpoints()
+    test_manual_rotation()
 

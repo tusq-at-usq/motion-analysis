@@ -42,7 +42,7 @@ def get_all_measurements(obs: List[ObservationGroup],
 
 def create_observable_function(obs: List[ObservationGroup],
                                x_dict: dict,
-                               u_dict: dict) -> np.array:
+                               u_dict: dict = {}) -> np.array:
     """
     Create combined observable function
 

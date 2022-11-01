@@ -83,7 +83,7 @@ class DynamicSystem:
         X_def_dict = {}
         P_def_dict = {}
         for X_i in self.X:
-            X_def_dict[self.sym_dict[X_i]] = {'Min':-1.,'Max':1.,'X0':1.}
+            X_def_dict[self.sym_dict[X_i]] = {'Min':-1.,'Max':1.,'X0':0.}
         for P_i in self.P:
             P_def_dict[self.sym_dict[P_i]] = {'Type':'Param','X0':1.,'Min':'-','Max':'-'}
         default_dict = {'System-name':self.name,'States':X_def_dict,'Parameters':P_def_dict}
@@ -106,6 +106,7 @@ class DynamicSystem:
         x_0 : np.array
             Initial state vector
         """
+
         with open(config_name+'.yaml') as file:
             in_dict = yaml.load(file, Loader=yaml.FullLoader)
         if in_dict['System-name'] != self.name:
@@ -129,6 +130,11 @@ class DynamicSystem:
         inputs : dict
         aug_states : dict
         """
+        if not os.path.exists(config_name+'.yaml'):
+            newconfig = input("No config found. Write new config? (y/n)")
+            if newconfig in ['y', 'Y']:
+                self.write_default_config(config_name)
+
         with open(config_name+'.yaml') as file:
             in_dict = yaml.load(file, Loader=yaml.FullLoader)
         if in_dict['System-name'] != self.name:

@@ -18,21 +18,22 @@ Geometry and camera views are handled in typical coordinate system:
 """
 
 import numpy as np
-from motiontrack.body_projection import View
+from motiontrack.body_projection import CameraView
 from motiontrack.utils import euler_to_quaternion
 from motiontrack.sample_bodies.vehicle import make_vehicle
+from motiontrack.sample_bodies.cube import make_cube
 from motiontrack.plot import PlotMatch
 
 def show_camera_viewpoints():
 
     body = make_vehicle()
-    Q = euler_to_quaternion(0, 0, 0)
+    Q = euler_to_quaternion(0, np.pi, -np.pi/2)
     body.initialise([0,0,0], [Q[0], Q[1], Q[2], Q[3]])
 
-    view_t = View(body,np.array([-np.pi/2,0.0,0.0]),"top")
-    view_w = View(body,np.array([np.pi, 0, np.pi/2]),"west")
-    view_e = View(body,np.array([0, 0, np.pi/2]),"east")
-    view_f = View(body,np.array([np.pi/2, 0, np.pi/2]),"front")
+    view_t = CameraView(body,np.array([-np.pi/2,0.0,0.0]),"top")
+    view_w = CameraView(body,np.array([np.pi, 0, np.pi/2]),"west")
+    view_e = CameraView(body,np.array([0, 0, np.pi/2]),"east")
+    view_f = CameraView(body,np.array([np.pi/2, 0, np.pi/2]),"front")
     views = [view_t, view_w, view_e, view_f]
 
     plot_t = PlotMatch('Top')

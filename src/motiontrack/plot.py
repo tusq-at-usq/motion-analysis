@@ -4,11 +4,12 @@ import numpy as np
 import pyqtgraph as pg
 
 class PlotMatch:
-    def __init__(self, name):
+    def __init__(self, name, resolution=None):
 
         # Set white background and black foreground
         pg.setConfigOption('background', 'w')
         pg.setConfigOption('foreground', 'k')
+        pg.setConfigOption('imageAxisOrder', 'row-major') # best performance
 
         # Create the main application instance
         self.app = pg.mkQApp()
@@ -16,19 +17,27 @@ class PlotMatch:
 
         # Create the view
         self.view = pg.PlotWidget()
-        self.view.resize(800, 600)
+
+        if resolution != None:
+            self.view.resize(resolution[0], resolution[1])
+            self.view.setXRange(0, resolution[0], padding=0)
+            self.view.setYRange(0, resolution[1], padding=0)
+
         self.view.setWindowTitle(name)
         self.view.setAspectLocked(True)
         self.view.show()
 
         self.blob_ob = pg.ScatterPlotItem(pen=pg.mkPen(width=20, color='r'),
                                               symbol='o', size=1)
-        self.blob_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=10, color='k'),
+        self.blob_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=10, color='b'),
                                            symbol='o', size=1)
 
         #  self.blob_ass = pg.PlotCurveItem(pen=pg.mkPen(width=1), connect='pairs')
         self.frame_pr = pg.PlotCurveItem(pen=pg.mkPen(width=1))
 
+        self.image = pg.ImageItem()
+
+        self.view.addItem(self.image)
         self.view.addItem(self.blob_ob)
         self.view.addItem(self.blob_pr)
         #  self.view.addItem(self.blob_ass)
@@ -43,6 +52,8 @@ class PlotMatch:
         self.blob_pr.setData(blob_x[:,0], blob_x[:,1])
         self.app.processEvents()
 
+    #TODO: Add plotting over image data
+
     #  def update_assocation(self, pair_data):
         #  self.blob_ass.setData(pair_data[:,0], pair_data[:,1])
         #  self.app.processEvents()
@@ -54,6 +65,12 @@ class PlotMatch:
         connect = np.array([True, True, True, False]*n_surf)
         self.frame_pr.setData(mesh[:,0], mesh[:,1], connect=connect)
         self.app.processEvents()
+
+    def update_image(self, im):
+        self.image.setImage(np.flip(im,axis=0))
+        #  self.image.setImage((im))
+        self.app.processEvents()
+
 
     def close(self):
         self.view.close()

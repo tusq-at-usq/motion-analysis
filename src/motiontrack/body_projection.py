@@ -50,6 +50,8 @@ class CameraView:
         This should be a common point amongst all cameras.
     scale : float, default=1
         Scale of the view in pixels/m
+    resolution : tuple, default=(1024, 1024)
+        Resolution of the camera angle in pixels (width, height)
     """
 
     def __init__(self,
@@ -57,13 +59,19 @@ class CameraView:
                  view_angle: Tuple[float] = (0,0,0),
                  name: str='unnamed_view',
                  scale: float = 1,
-                 offset: Tuple[float] = (0,0,0)):
+                 offset: Tuple[float] = (0,0,0),
+                 resolution: Tuple[float] = (1024, 1024),
+                 perspective: dict= {'active':False,
+                                     'scale_distance':0.76,
+                                     'centre_pixel': (512,512)}):
 
         self.body = body
         self.view_angle = view_angle
         self.name = name
         self.scale = scale
         self.offset = np.array([offset]).T
+        self.resolution = resolution
+        self.perspective = perspective
 
         q0, q1, q2, q3 = euler_to_quaternion(*self.view_angle)
 
@@ -75,7 +83,7 @@ class CameraView:
 
     def _transform(self, x: np.array, keep_depth = False):
         """
-        Internal function which converts 3-dimensiona, local frame vectors to
+        Internal function which converts 3-dimensional, local frame vectors to
         2-dimensional camera pixel coordiantes
 
         Steps:
@@ -97,12 +105,25 @@ class CameraView:
             A matrix of 2-dimensional pixel coordinates representing the camera frame
         """
 
-        y = (self.T_VL@x * self.scale - self.offset)
+        y = (self.T_VL@x * self.scale + self.offset)
+
+        if self.perspective['active']:
+            # Distance of points to camera sensor
+            distances = self.perspective['scale_distance'] - \
+            (self.offset[2] + y[2,:])/self.scale
+            # X-point perspectives
+            y[0,:] = self.perspective['centre_pixel'][0] + \
+                (y[0,:] - self.perspective['centre_pixel'][0]) * \
+                (self.perspective['scale_distance']/distances)
+            # Y-point perspectives
+            y[1,:] = self.perspective['centre_pixel'][1] + \
+                (y[1,:] - self.perspective['centre_pixel'][1]) * \
+                (self.perspective['scale_distance']/distances)
         if keep_depth:
             return y
         return y[:2,:]
 
-    def get_blobs(self, angle_threshold: float=0.01) -> BlobsFrame:
+    def get_blobs(self, angle_threshold: float=0.05) -> BlobsFrame:
         """
         Get the pixel locations of blobs in 2-dimensional XY coordinates
 
@@ -136,7 +157,7 @@ class CameraView:
 
         return BlobsFrame(blob_2d, blob_sizes)
 
-    def get_mesh(self, angle_threshold:float=0.01) -> Tuple[np.array, np.array]:
+    def get_mesh(self, angle_threshold:float=0.05) -> Tuple[np.array, np.array]:
         """
         Get the pixel locations of mesh in  2-dimensional XY coordinates
 

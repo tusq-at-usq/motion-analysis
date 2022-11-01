@@ -34,7 +34,7 @@ import numpy as np
 from numpy import linalg as la
 import stl
 import vtkplotlib as vpl
-from motiontrack.utils import quaternions_to_rotation_tensor
+from motiontrack.utils import *
 
 class BodySTL:
     def __init__(self):
@@ -67,7 +67,7 @@ class BodySTL:
         """
         self.mesh_0 = stl.mesh.Mesh.from_file(filepath)
         self.mesh_0.data['vectors'] *= scale
-        self.mesh_0.data['normals'] *= scale
+        self.mesh_0.data['normals'] *= scale**2
         self.n_faces = self.mesh_0.data.shape[0]
         self.normal_mags = la.norm(self.mesh_0.normals,axis=1)
 
@@ -146,7 +146,7 @@ class BodySTL:
                    Q0: Union[np.array, List[float]]):
 
         self.mesh_0.translate(X0)
-        T_BL = quaternions_to_rotation_tensor(*Q0)
+        T_BL = quaternion_to_rotation_tensor(*Q0)
         self.mesh_0.rotate_using_matrix(T_BL.T, point=self.Xb)
 
         self.mesh = copy.deepcopy(self.mesh_0)
@@ -166,7 +166,7 @@ class BodySTL:
             The quatnernions of the new orientation (relative to original 
             orientation), with the scalar component as element 0. 
         """
-        T_L = quaternions_to_rotation_tensor(*Qb)
+        T_L = quaternion_to_rotation_tensor(*Qb)
         self.vectors[:,:,:] = self.to_ndarray(T_L@self.to_vectors(self.vectors0))
         self.vectors[:,:,0] += Xb[0]
         self.vectors[:,:,1] += Xb[1]
@@ -181,18 +181,36 @@ class BodySTL:
         #TODO: This could be cleaned up, to remove attribute checking
         if not hasattr(self, 'fig'):
             self.fig = vpl.QtFigure(name='Body mesh plot')
-            vpl.view(camera_direction=[0,1,0], up_view=[0, 0, 1])
+            self.view_dict = vpl.view(camera_direction=[0,1,0], up_view=[0, 0, 1])
             vpl.gcf().update()
             vpl.reset_camera(fig=self.fig)
         if hasattr(self, 'mesh_plot'):
             self.fig -= self.mesh_plot
         if hasattr(self, 'blob_plot'):
             self.fig -= self.blob_plot
-        self.blob_plot = vpl.scatter(self.blob_x, color='k', fig=self.fig)
+        self.blob_plot = vpl.scatter(self.blob_x, color='k', fig=self.fig, radius=self.blob_s)
         self.mesh_plot = vpl.mesh_plot(self, fig=self.fig, opacity=1)
         vpl.gcf().update()
         vpl.reset_camera(fig=self.fig)
         self.fig.show(block=False)
+
+    def get_camera_angle(self):
+        q0 = (0.7071067811865476, -0.7071067811865475, 0.0, 0.0)
+
+        self.view_dict = vpl.view()
+        wxyz = self.fig.camera.GetOrientationWXYZ()
+        w_rad = np.deg2rad(wxyz[0])
+        q_total = wxyz_to_quaternion(w_rad, wxyz[1], wxyz[2], wxyz[3])
+        q_rot = quaternion_subtract(q_total, q0)
+        return q_rot
+
+    def get_face_centroids(self):
+        centroids = np.average(self.vectors,axis=1)
+        return centroids
+
+    @property
+    def face_centres(self):
+        return self.get_face_centroids()
 
     @property
     def normals(self):

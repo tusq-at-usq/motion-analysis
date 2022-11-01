@@ -10,7 +10,7 @@ STL_PATH = os.path.join(os.path.dirname(__file__), 'data/cube.stl')
 
 def make_cube():
     body = BodySTL()
-    body.import_file(STL_PATH)
+    body.import_file(STL_PATH, scale=1e-3)
     body.define_centroid()
     blob_x = np.array([
         [-50, 0, 0], # Back
@@ -36,8 +36,8 @@ def make_cube():
         [-45, -45, -50], # Bottom
         [45, 45, -50], # Bottom
         [-45, 45, -50] # Bottom
-    ])
-    sizes = np.full(len(blob_x),0.01)
+    ])*1e-3
+    sizes = np.full(len(blob_x),0.002)
     body.add_blobs(blob_x, sizes)
 
     return body

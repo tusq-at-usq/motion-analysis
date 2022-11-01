@@ -7,6 +7,13 @@ import sympy as sp
 
 from scipy.spatial.transform import Rotation as R
 
+def wxyz_to_quaternion(w_rad, x, y, z):
+    q0 = np.cos(w_rad/2)     
+    q1 = np.sin(w_rad/2)*x
+    q2 = np.sin(w_rad/2)*y
+    q3 = np.sin(w_rad/2)*z
+    return np.array([q0, q1, q2, q3])
+
 def quaternion_to_rotation_tensor(q0: float, q1: float, q2: float, q3: float,
                        package: str='numpy') -> Union[np.array, sp.Matrix]:
     """
@@ -72,7 +79,7 @@ def quaternion_to_matrix(q: Union[np.array, List[float]]) -> np.array:
     """
     Matrix representation of quaternion
 
-    Quaternion order is q = {a1 + bi + cj + k}
+    Quaternion order is q = {a1 + bi + cj + dk}
 
     Parameters
     ----------
@@ -80,9 +87,9 @@ def quaternion_to_matrix(q: Union[np.array, List[float]]) -> np.array:
         Quaternion vector to convert to matrix representation
     """
     Q = np.array([[q[0], q[1], q[2], q[3]],
-                  [-q[1], q[0], -q[3], q[2]],
-                  [-q[2], q[3], q[0], -q[1]],
-                  [-q[3], -q[2], q[1], q[0]]]).T
+                  [-q[1], q[0], q[3], -q[2]],
+                  [-q[2], -q[3], q[0], q[1]],
+                  [-q[3], q[2], -q[1], q[0]]])
     return Q
 
 def quaternion_multiply(q_mul: np.array, q0: np.array) -> np.array:
@@ -115,7 +122,7 @@ def quaternion_subtract(q0: np.array, q_sub: np.array) -> np.array:
     Quaternion subtraction
 
     Note multiplication is not commutative.
-    Quaternion order is q = {a1 + bi + cj + k}.
+    Quaternion order is q = {a1 + bi + cj + dk}.
     Operation by converting both to matrix form, then using dot product of
     quaternion matrix inverse.
 
@@ -133,8 +140,8 @@ def quaternion_subtract(q0: np.array, q_sub: np.array) -> np.array:
     """
     Q0 = quaternion_to_matrix(q0)
     Q_sub = quaternion_to_matrix(q_sub)
-    Q_diff = Q0 * np.linalg.inv(Q_sub)
-    return Q_diff[:,0]
+    Q_diff = Q0 @ np.linalg.inv(Q_sub)
+    return Q_diff[0,:]
 
 #  def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
 def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
