@@ -65,6 +65,9 @@ class SpatialMatch:
             Y_d = Y_ds_unfilt[i]
             D_d = D_ds_unfilt[i]
 
+            p_i = np.array([X_d, Y_d])
+            plots[i].update_observation(p_i)
+
             # Update model and views
             p = np.array(p0)
             self.B.update(p,Q0)
@@ -116,8 +119,11 @@ class SpatialMatch:
                         blob_map.append(np.argmin(norms))
                         j = np.argmin(norms)
                         p_p = np.delete(p_p.T,j,axis=1).T # Option: only allow each dot to be used once
-                        min_norms.append(np.min(norms)**2) 
+                        min_norms.append(np.min(norms)) 
                         # OPTIONAL: Weight by surface norm
+                rms = np.mean(np.array(min_norms)**2)**0.5
+                min_norms = np.array(min_norms)[np.where(np.abs(min_norms)<2*rms)]
+                min_norms = min_norms**2
                 error_ = np.mean(min_norms[0:np.min((blobs.n,blobs.n))])
                 error = error + error_
             return error
@@ -126,16 +132,18 @@ class SpatialMatch:
             for view, X_d, Y_d, plot in zip(self.Vs, X_ds, Y_ds, plots):
                 blobs_p = view.get_blobs()
                 frame_p = view.get_mesh()
+                cent = view.get_CoM()
                 p_i = np.array([X_d, Y_d])
                 plot.update_observation(p_i)
                 plot.update_projection(blobs_p)
                 plot.update_mesh(*frame_p)
+                plot.update_CoM(cent)
                 #  time.sleep(0.01)
 
         C0 = np.ones(7) 
         sol = minimize(get_cost,C0,method="Powell",callback=callback_plot, 
-                       options={'xtol':1e-4,
-                                'ftol':1e-2})
+                       options={'xtol':1e-8,
+                                'ftol':1e-6})
 
         C = sol.x
         Q_final = Q0 * C[0:4]

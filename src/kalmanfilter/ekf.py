@@ -221,7 +221,7 @@ class ExtendedKalmanFilter():
         dt : float
             Time-step. NOTE: Currently not used
         """
-        dx = 1e-3
+        dx = 1e-6
 
         x0 = x.copy()
         #  x1 = self._fx(x0,dt)

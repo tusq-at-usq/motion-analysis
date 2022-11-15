@@ -32,6 +32,9 @@ class PlotMatch:
         self.blob_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=10, color='b'),
                                            symbol='o', size=1)
 
+        self.blob_CoM = pg.ScatterPlotItem(pen=pg.mkPen(width=15, color='g'),
+                                           symbol='o', size=1)
+
         #  self.blob_ass = pg.PlotCurveItem(pen=pg.mkPen(width=1), connect='pairs')
         self.frame_pr = pg.PlotCurveItem(pen=pg.mkPen(width=1))
 
@@ -40,8 +43,13 @@ class PlotMatch:
         self.view.addItem(self.image)
         self.view.addItem(self.blob_ob)
         self.view.addItem(self.blob_pr)
+        self.view.addItem(self.blob_CoM)
         #  self.view.addItem(self.blob_ass)
         self.view.addItem(self.frame_pr)
+
+    def update_CoM(self,blob_cent):
+        self.blob_CoM.setData(blob_cent[0], blob_cent[1])
+        self.app.processEvents()
 
     def update_observation(self,blob_x):
         self.blob_ob.setData(blob_x[0], blob_x[1])
@@ -184,13 +192,13 @@ class PlotTrack:
         self.q2.setData(t, x[self.x_dict['q2']])
         self.q3.setData(t, x[self.x_dict['q3']])
 
-        self.u.setData(t, x[self.x_dict['u']])
-        self.v.setData(t, x[self.x_dict['v']])
-        self.w.setData(t, x[self.x_dict['w']])
+        self.u.setData(t, x[self.x_dict['v_x']])
+        self.v.setData(t, x[self.x_dict['v_y']])
+        self.w.setData(t, x[self.x_dict['v_z']])
 
-        #  self.p.setData(t, x[self.x_dict['a_x']])
-        #  self.q.setData(t, x[self.x_dict['a_y']])
-        #  self.r.setData(t, x[self.x_dict['a_z']])
+        self.p.setData(t, x[self.x_dict['p']])
+        self.q.setData(t, x[self.x_dict['q']])
+        self.r.setData(t, x[self.x_dict['r']])
 
         self.app.processEvents()
 
@@ -211,14 +219,14 @@ class PlotTrack:
         x = np.array(x).T
         t = np.array(t)
         if x.shape[1] > 1:
-            self.x_pr.setData(t, x[0])
-            self.y_pr.setData(t, x[1])
-            self.z_pr.setData(t, x[2])
+            self.x_pr.setData(t, x[self.x_dict['x']])
+            self.y_pr.setData(t, x[self.x_dict['y']])
+            self.z_pr.setData(t, x[self.x_dict['z']])
 
-            #  self.q0_pr.setData(t, x[3])
-            #  self.q1_pr.setData(t, x[4])
-            #  self.q2_pr.setData(t, x[5])
-            #  self.q3_pr.setData(t, x[6])
+            self.q0_pr.setData(t, x[self.x_dict['q0']])
+            self.q1_pr.setData(t, x[self.x_dict['q1']])
+            self.q2_pr.setData(t, x[self.x_dict['q2']])
+            self.q3_pr.setData(t, x[self.x_dict['q3']])
 
     def load_true_data(self, x_true, t):
         x_true = np.array(x_true).T
@@ -246,7 +254,7 @@ class PlotTrack:
     def load_smoothed_data(self, x_smoothed, t):
         x_smoothed = np.array(x_smoothed).T
         t = np.array(t)
-        pen = pg.mkPen(15, width=1)
+        pen = pg.mkPen(20, width=1)
 
         self.p1.plot(t, x_smoothed[self.x_dict['x']], pen=pen)
         self.p1.plot(t, x_smoothed[self.x_dict['y']], pen=pen)
@@ -257,13 +265,13 @@ class PlotTrack:
         self.p2.plot(t, x_smoothed[self.x_dict['q2']],pen=pen)
         self.p2.plot(t, x_smoothed[self.x_dict['q3']],pen=pen)
 
-        self.p3.plot(t, x_smoothed[self.x_dict['u']], pen=pen)
-        self.p3.plot(t, x_smoothed[self.x_dict['v']], pen=pen)
-        self.p3.plot(t, x_smoothed[self.x_dict['w']], pen=pen)
+        self.p3.plot(t, x_smoothed[self.x_dict['v_x']], pen=pen)
+        self.p3.plot(t, x_smoothed[self.x_dict['v_y']], pen=pen)
+        self.p3.plot(t, x_smoothed[self.x_dict['v_z']], pen=pen)
 
-        #  self.p4.plot(t, x_smoothed[self.x_dict['a_x']], pen=pen)
-        #  self.p4.plot(t, x_smoothed[self.x_dict['a_y']], pen=pen)
-        #  self.p4.plot(t, x_smoothed[self.x_dict['a_z']], pen=pen)
+        self.p4.plot(t, x_smoothed[self.x_dict['p']], pen=pen)
+        self.p4.plot(t, x_smoothed[self.x_dict['q']], pen=pen)
+        self.p4.plot(t, x_smoothed[self.x_dict['r']], pen=pen)
 
         self.app.processEvents()
 

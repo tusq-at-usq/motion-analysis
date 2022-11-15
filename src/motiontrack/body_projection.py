@@ -110,7 +110,8 @@ class CameraView:
         if self.perspective['active']:
             # Distance of points to camera sensor
             distances = self.perspective['scale_distance'] - \
-            (self.offset[2] + y[2,:])/self.scale
+            (y[2,:])/self.scale
+            #  (self.offset[2] + y[2,:])/self.scale
             # X-point perspectives
             y[0,:] = self.perspective['centre_pixel'][0] + \
                 (y[0,:] - self.perspective['centre_pixel'][0]) * \
@@ -123,7 +124,14 @@ class CameraView:
             return y
         return y[:2,:]
 
-    def get_blobs(self, angle_threshold: float=0.05) -> BlobsFrame:
+    def get_visible_blobs(self, angle_threshold: float=0.1):
+        dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
+        visible_surfs = np.where(dot_prods > angle_threshold)[0]
+        visible_blobs = np.array([j for i in visible_surfs \
+                                  for j in self.body.surface_blobs[i]])
+        return visible_blobs
+
+    def get_blobs(self, angle_threshold: float=0.1) -> BlobsFrame:
         """
         Get the pixel locations of blobs in 2-dimensional XY coordinates
 
@@ -184,6 +192,27 @@ class CameraView:
         )[visible_surfs]
         visible_angles = dot_prods[visible_surfs]
         return visible_mesh, visible_angles
+
+    def get_CoM(self) -> np.array:
+        """
+        Get the location of the body centre in 2-dimensional XY coordinates.
+
+        Returns
+        -------
+        cent_coords : np.array
+            2-dimensional cooridinates of the centre of mass
+        """
+        centroid = np.array([self.body.Xb.copy()]).T
+        cent_coords = self._transform(centroid)
+        return cent_coords
+
+    def project(self, X, Q):
+        self.body.update(X, Q)
+        blob_frame = self.get_blobs()
+        mesh = self.get_mesh()
+        return blob_frame, mesh
+
+
 
 
 

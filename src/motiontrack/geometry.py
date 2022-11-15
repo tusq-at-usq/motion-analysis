@@ -166,22 +166,24 @@ class BodySTL:
             The quatnernions of the new orientation (relative to original 
             orientation), with the scalar component as element 0. 
         """
+        self.Xb = Xb
         T_L = quaternion_to_rotation_tensor(*Qb)
-        self.vectors[:,:,:] = self.to_ndarray(T_L@self.to_vectors(self.vectors0))
-        self.vectors[:,:,0] += Xb[0]
-        self.vectors[:,:,1] += Xb[1]
-        self.vectors[:,:,2] += Xb[2]
+        self.vectors[:,:,:] = self.to_ndarray(T_L@self.to_vectors(self.vectors0)) + Xb.reshape(-1,1).T
         self.normals[:,:] = (T_L@self.normals0.T).T
-        self.blob_x[:,:] = (T_L@self.to_vectors(self.blob_x0)).T.reshape(-1,3)
-        self.blob_x[:,0] += Xb[0]
-        self.blob_x[:,1] += Xb[1]
-        self.blob_x[:,2] += Xb[2]
+        self.blob_x[:,:] = (T_L@self.to_vectors(self.blob_x0)).T.reshape(-1,3) + Xb.reshape(-1,1).T
+
+    #  def project_blobs(self, Xb: np.array, Q: np.array):
+        #  T_L = quaternion_to_rotation_tensor(*Q)
+        #  blobs = self.blob_x.copy()
+        #  blobs = (T_L@self.to_vectors(blobs)).T.reshape(-1,3) + Xb.reshape(-1,1).T
+        #  return blobs
 
     def plot(self):
         #TODO: This could be cleaned up, to remove attribute checking
         if not hasattr(self, 'fig'):
             self.fig = vpl.QtFigure(name='Body mesh plot')
             self.view_dict = vpl.view(camera_direction=[0,1,0], up_view=[0, 0, 1])
+            self.fig.camera.SetParallelProjection(1)
             vpl.gcf().update()
             vpl.reset_camera(fig=self.fig)
         if hasattr(self, 'mesh_plot'):
