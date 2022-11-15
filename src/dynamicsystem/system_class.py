@@ -40,6 +40,10 @@ class DynamicSystem:
         self.param_dict_inv = {v: k for k, v in self.param_dict.items()}
         self.input_dict_inv = {}
 
+        # Raw config data used when writing a new config
+        self.state_config_dict = {}
+        self.param_config_dict = {}
+
         self.x_dict = {name:i for i,name in enumerate(self.state_dict.values())}
         self.u_dict = {}
 
@@ -90,6 +94,22 @@ class DynamicSystem:
 
         with open(config_name+'.yaml', 'w') as file:
             yaml.dump(default_dict, file, sort_keys=False)
+            return
+
+    def write_config(self, config_name: str, x: np.array):
+        if os.path.isfile(config_name+'.yaml'):
+            print ("WARNING: Input file already exists")
+            rep = input("Override? (Y/N)")
+            if rep not in ['Y','y']:
+                print("Not overwriting")
+                return
+        new_state_dict = self.state_config_dict.copy()
+        for key, index in self.x_dict.items():
+            new_state_dict[key]['X0'] = float(x[index])
+
+        write_dict = {'System-name':self.name,'States':new_state_dict,'Parameters':self.param_config_dict}
+        with open(config_name+'.yaml', 'w') as file:
+            yaml.dump(write_dict, file, sort_keys=False)
             return
 
     def load_x_0(self, config_name: str) -> np.array:
@@ -151,6 +171,8 @@ class DynamicSystem:
                 inputs[P[0]] = P[1]
             elif P[1]["Type"] == 'Aug_state':
                 aug_states[P[0]] = P[1]
+        self.state_config_dict = in_dict["States"]
+        self.param_config_dict = in_dict["Parameters"]
         return states, params, inputs, aug_states
 
     def add_aug_states(self, config_name: str):
