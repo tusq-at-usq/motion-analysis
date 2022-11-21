@@ -2,6 +2,7 @@ import sys
 
 import numpy as np
 import pyqtgraph as pg
+from pyqtgraph import QtCore
 
 class PlotMatch:
     def __init__(self, name, resolution=None):
@@ -254,7 +255,7 @@ class PlotTrack:
     def load_smoothed_data(self, x_smoothed, t):
         x_smoothed = np.array(x_smoothed).T
         t = np.array(t)
-        pen = pg.mkPen(20, width=1)
+        pen = pg.mkPen(0.2, style=QtCore.Qt.DashLine, width=1)
 
         self.p1.plot(t, x_smoothed[self.x_dict['x']], pen=pen)
         self.p1.plot(t, x_smoothed[self.x_dict['y']], pen=pen)

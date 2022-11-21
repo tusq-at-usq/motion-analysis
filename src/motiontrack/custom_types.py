@@ -54,6 +54,15 @@ class ObservationGroup:
         return t, z, tau
 
     def change_size(self, nz):
+        """
+        Change the number of observations 
+        (for dynamically defined observations)
+
+        Parameters
+        ----------
+        nz : int
+            Updated number of observations
+        """
         self.size = nz
 
     # <Override>
@@ -120,7 +129,7 @@ class ObservationGroup:
 
     def residual(self,y1,y0):
         """ Placeholder for residual calculation.
-            Overide if using quaternions
+            May want to override for quaternions
             """
         return y1-y0
 
