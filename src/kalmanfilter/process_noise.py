@@ -3,7 +3,7 @@
 
 import numpy as np
 from scipy.linalg import expm
-import quadpy
+from scipy import integrate
 
 def custom_process_noise(A: np.array,
                          Q_c: np.array,
@@ -32,13 +32,11 @@ def custom_process_noise(A: np.array,
     Q_d : np.array
         Discrete-time process noise matrix
     """
-    def _eval(ts):
-        res = []
-        for t in ts:
-            res.append(expm(A*t)@(Q_c*density)@expm(A*t).T)
-        return np.moveaxis(res, 0, 2)
 
-    Q_d, err = quadpy.quad(_eval, 0, dt)
+    def eval(t):
+        return expm(A*t)@(Q_c*density)@expm(A*t).T
+
+    Q_d = integrate.quad_vec(eval, 0.0, dt)[0]
     return Q_d
 
 
