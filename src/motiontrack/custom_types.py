@@ -3,6 +3,7 @@
 
 from typing import List, Tuple, Callable
 import numpy as np
+import cv2 as cv
 
 class ObservationGroup:
     """ Template for an observation group, to be inherited by custom functions.
@@ -150,3 +151,16 @@ class ObservationGroup:
     def get_nz(self):
         """ Return number of observables """
         return self.size
+
+class CameraCalibration:
+    def __init__(self, mtx, dist, R=np.eye(3), T=np.array([0.,0.,0.])):
+        self.mtx = mtx
+        self.dist = dist
+        self.R = R
+        self.T = T
+
+    def project(self, X):
+        Y = cv.projectPoints(X, self.R, self.T, self.mtx, self.dist)
+        Y = Y[0].reshape(-1,2)
+        return Y
+

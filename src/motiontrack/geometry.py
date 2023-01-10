@@ -240,6 +240,9 @@ class BodySTL:
     def to_ndarray(self, x):
         return x.T.reshape(self.n_faces, 3, 3)
 
+    def to_2d_ndarray(self, x):
+        return x.T.reshape(self.n_faces, 3, 2)
+
     @property
     def unit_normals(self):
         return (self.normals.T/self.normal_mags).T
@@ -258,6 +261,11 @@ class BodySTL:
 
     def to_mesh(self, x):
         return self.to_ndarray(x)
+
+    def to_2d_mesh(self, x):
+        return self.to_2d_ndarray(x)
+
+
 
 
 

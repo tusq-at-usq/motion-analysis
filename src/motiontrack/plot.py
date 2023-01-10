@@ -68,9 +68,10 @@ class PlotMatch:
         #  self.app.processEvents()
 
     def update_mesh(self, mesh, angles):
+        mesh_dim = mesh.shape[2]
         n_surf = mesh.shape[0]
-        mesh = np.concatenate((mesh, mesh[:,0,:].reshape(n_surf,1,3)),axis=1)
-        mesh = mesh.reshape(-1,3)
+        mesh = np.concatenate((mesh, mesh[:,0,:].reshape(n_surf,1,mesh_dim)),axis=1)
+        mesh = mesh.reshape(-1,mesh_dim)
         connect = np.array([True, True, True, False]*n_surf)
         self.frame_pr.setData(mesh[:,0], mesh[:,1], connect=connect)
         self.app.processEvents()

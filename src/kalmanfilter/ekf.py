@@ -310,6 +310,7 @@ class ExtendedKalmanFilter():
         # P = (I-KH)P usually seen in the literature.
         I_KH = self._I - np.dot(self.K, H)
         self.P = np.dot(np.dot(I_KH, self.P),I_KH.T) + np.dot(np.dot(self.K, R),self.K.T)
+        #  self.P = I_KH@self.P
 
         # set to None to force recompute
         self._log_likelihood = None

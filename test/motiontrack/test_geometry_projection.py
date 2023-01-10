@@ -64,6 +64,6 @@ def test_manual_rotation():
 
 if __name__=='__main__':
 
-    show_camera_viewpoints()
+    #  show_camera_viewpoints()
     test_manual_rotation()
 
