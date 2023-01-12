@@ -70,9 +70,11 @@ class CameraView:
         self.R_L = R_L
 
         # Vector of camera viewpoint
-        self.R_VL = self.R_L@self.cal.R
-        self.s_LV = np.matmul(np.array([0,0,1]),self.R_VL)
-        self.cal.R = self.R_L@self.cal.R
+        # The theory of this is to calculate the vector in global coordinates
+        # of the negative-z vector in local camera coordiantes.
+        # This vector is then used to determine which faces are facing the
+        # camera.
+        self.s_LV = self.cal.R_L.T@self.cal.R.T@np.array([0,0,-1])
 
 
     def _transform(self, x: np.array):

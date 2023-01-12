@@ -19,10 +19,12 @@ class PlotMatch:
         # Create the view
         self.view = pg.PlotWidget()
 
+        self.y = 1024
         if resolution != None:
             self.view.resize(resolution[0], resolution[1])
             self.view.setXRange(0, resolution[0], padding=0)
             self.view.setYRange(0, resolution[1], padding=0)
+            self.y = resolution[1]
 
         self.view.setWindowTitle(name)
         self.view.setAspectLocked(True)
@@ -48,17 +50,22 @@ class PlotMatch:
         #  self.view.addItem(self.blob_ass)
         self.view.addItem(self.frame_pr)
 
+    def invert(self,Y):
+        # Invert Y axis from downwards-positive openCV axis system
+        Y_ = -1*Y + self.y
+        return Y_
+
     def update_CoM(self,blob_cent):
         self.blob_CoM.setData(blob_cent[0], blob_cent[1])
         self.app.processEvents()
 
     def update_observation(self,blob_x):
-        self.blob_ob.setData(blob_x[0], blob_x[1])
+        self.blob_ob.setData(blob_x[0], self.inverT(blob_x[1]))
         self.app.processEvents()
 
     def update_projection(self, blob_data):
         blob_x = blob_data.points
-        self.blob_pr.setData(blob_x[:,0], blob_x[:,1])
+        self.blob_pr.setData(blob_x[:,0], self.invert(blob_x[:,1]))
         self.app.processEvents()
 
     #TODO: Add plotting over image data
@@ -73,7 +80,7 @@ class PlotMatch:
         mesh = np.concatenate((mesh, mesh[:,0,:].reshape(n_surf,1,mesh_dim)),axis=1)
         mesh = mesh.reshape(-1,mesh_dim)
         connect = np.array([True, True, True, False]*n_surf)
-        self.frame_pr.setData(mesh[:,0], mesh[:,1], connect=connect)
+        self.frame_pr.setData(mesh[:,0], self.invert(mesh[:,1]), connect=connect)
         self.app.processEvents()
 
     def update_image(self, im):

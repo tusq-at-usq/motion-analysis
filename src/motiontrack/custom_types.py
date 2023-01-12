@@ -156,11 +156,16 @@ class CameraCalibration:
     def __init__(self, mtx, dist, R=np.eye(3), T=np.array([0.,0.,0.])):
         self.mtx = mtx
         self.dist = dist
-        self.R = R
-        self.T = T
+        self.R = R # Rotation from camera 2 to camera 1
+        self.T = T # Translation from camera 2 to camera 1
+        self.R_L = np.eye(3) # Rotation from C1 openCV to local coordiantes
 
-    def project(self, X):
-        Y = cv.projectPoints(X, self.R, self.T, self.mtx, self.dist)
+
+    def project(self, X, R_C=None):
+        if R_C is None:
+            R_C = self.R
+        print(self.R_L@X)
+        Y = cv.projectPoints(self.R_L@X, R_C, self.T, self.mtx, self.dist)
         Y = Y[0].reshape(-1,2)
         return Y
 

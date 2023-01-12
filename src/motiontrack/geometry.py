@@ -182,7 +182,9 @@ class BodySTL:
         #TODO: This could be cleaned up, to remove attribute checking
         if not hasattr(self, 'fig'):
             self.fig = vpl.QtFigure(name='Body mesh plot')
-            self.view_dict = vpl.view(camera_direction=[0,1,0], up_view=[0, 0, 1])
+            self.q0 = np.array([1, 0, 0, 0])
+            self.view_dict = vpl.view(camera_direction=[0,0,-1], up_view=[1, 0, 0])
+            self.q0 = self.get_camera_angle()
             self.fig.camera.SetParallelProjection(1)
             vpl.gcf().update()
             vpl.reset_camera(fig=self.fig)
@@ -197,13 +199,13 @@ class BodySTL:
         self.fig.show(block=False)
 
     def get_camera_angle(self):
-        q0 = (0.7071067811865476, -0.7071067811865475, 0.0, 0.0)
-
+        #  q0 = (0.7071067811865476, -0.7071067811865475, 0.0, 0.0)
         self.view_dict = vpl.view()
         wxyz = self.fig.camera.GetOrientationWXYZ()
         w_rad = np.deg2rad(wxyz[0])
         q_total = wxyz_to_quaternion(w_rad, wxyz[1], wxyz[2], wxyz[3])
-        q_rot = quaternion_subtract(q_total, q0)
+        q_rot = quaternion_subtract(q_total, self.q0)
+        #  q_rot = q_total
         return q_rot
 
     def get_face_centroids(self):
