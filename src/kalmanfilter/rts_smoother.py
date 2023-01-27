@@ -59,7 +59,11 @@ def rts_smoother(xs: List[np.array],
             return x
 
     n = len(xs)
-    if not all(n_i == n for n_i in [len(Ps), len(Fs), len(Qs), len(x_prs), len(P_prs)]):
+    if not all(n_i == n for n_i in [len(Ps),
+                                    len(Fs),
+                                    len(Qs),
+                                    len(x_prs),
+                                    len(P_prs)]):
         print("ERROR: RTS smoother inputs are not same length")
 
     x_rts = [None]*n

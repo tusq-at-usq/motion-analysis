@@ -40,6 +40,7 @@ class PlotMatch:
 
         #  self.blob_ass = pg.PlotCurveItem(pen=pg.mkPen(width=1), connect='pairs')
         self.frame_pr = pg.PlotCurveItem(pen=pg.mkPen(width=1))
+        self.edges = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='orange'))
 
         self.image = pg.ImageItem()
 
@@ -49,6 +50,7 @@ class PlotMatch:
         self.view.addItem(self.blob_CoM)
         #  self.view.addItem(self.blob_ass)
         self.view.addItem(self.frame_pr)
+        self.view.addItem(self.edges)
 
     def invert(self,Y):
         # Invert Y axis from downwards-positive openCV axis system
@@ -60,7 +62,7 @@ class PlotMatch:
         self.app.processEvents()
 
     def update_observation(self,blob_x):
-        self.blob_ob.setData(blob_x[0], self.inverT(blob_x[1]))
+        self.blob_ob.setData(blob_x[0], self.invert(blob_x[1]))
         self.app.processEvents()
 
     def update_projection(self, blob_data):
@@ -81,6 +83,16 @@ class PlotMatch:
         mesh = mesh.reshape(-1,mesh_dim)
         connect = np.array([True, True, True, False]*n_surf)
         self.frame_pr.setData(mesh[:,0], self.invert(mesh[:,1]), connect=connect)
+        self.app.processEvents()
+
+    def update_edges(self, line_st, line_en):
+
+        #  np.ravel([A,B],'F')
+        x = np.ravel((line_st[:,0],line_en[:,0]),'F')
+        y = np.ravel((line_st[:,1],line_en[:,1]),'F')
+
+        connect = np.array([True, False]*int(len(x)/2))
+        self.edges.setData(x,self.invert(y),connect=connect[:-1])    
         self.app.processEvents()
 
     def update_image(self, im):
@@ -149,6 +161,25 @@ class PlotTrack:
         self.q = pg.PlotCurveItem(pen=pg.mkPen(9, width=1))
         self.r = pg.PlotCurveItem(pen=pg.mkPen(10, width=1))
 
+
+        sm_pen = pg.mkPen(0.2, style=QtCore.Qt.DashLine, width=1)
+        self.x_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.y_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.z_sm = pg.PlotCurveItem(pen=sm_pen)
+
+        self.q0_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.q1_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.q2_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.q3_sm = pg.PlotCurveItem(pen=sm_pen)
+
+        self.u_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.v_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.w_sm = pg.PlotCurveItem(pen=sm_pen)
+
+        self.p_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.q_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.r_sm = pg.PlotCurveItem(pen=sm_pen)
+
         self.x_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=5, color=1),
                                               symbol='o', size=1)
         self.y_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=5, color=2),
@@ -168,6 +199,9 @@ class PlotTrack:
         self.p1.addItem(self.x)
         self.p1.addItem(self.y)
         self.p1.addItem(self.z)
+        self.p1.addItem(self.x_sm)
+        self.p1.addItem(self.y_sm)
+        self.p1.addItem(self.z_sm)
         self.p1.addItem(self.x_pr)
         self.p1.addItem(self.y_pr)
         self.p1.addItem(self.z_pr)
@@ -180,14 +214,24 @@ class PlotTrack:
         self.p2.addItem(self.q1_pr)
         self.p2.addItem(self.q2_pr)
         self.p2.addItem(self.q3_pr)
+        self.p2.addItem(self.q0_sm)
+        self.p2.addItem(self.q1_sm)
+        self.p2.addItem(self.q2_sm)
+        self.p2.addItem(self.q3_sm)
 
         self.p3.addItem(self.u)
         self.p3.addItem(self.v)
         self.p3.addItem(self.w)
+        self.p3.addItem(self.u_sm)
+        self.p3.addItem(self.v_sm)
+        self.p3.addItem(self.w_sm)
 
         self.p4.addItem(self.p)
         self.p4.addItem(self.q)
         self.p4.addItem(self.r)
+        self.p4.addItem(self.p_sm)
+        self.p4.addItem(self.q_sm)
+        self.p4.addItem(self.r_sm)
 
     def update_state(self, x, t):
         x = np.array(x).T
@@ -265,22 +309,22 @@ class PlotTrack:
         t = np.array(t)
         pen = pg.mkPen(0.2, style=QtCore.Qt.DashLine, width=1)
 
-        self.p1.plot(t, x_smoothed[self.x_dict['x']], pen=pen)
-        self.p1.plot(t, x_smoothed[self.x_dict['y']], pen=pen)
-        self.p1.plot(t, x_smoothed[self.x_dict['z']], pen=pen)
+        self.x_sm.setData(t, x_smoothed[self.x_dict['x']])
+        self.y_sm.setData(t, x_smoothed[self.x_dict['y']])
+        self.z_sm.setData(t, x_smoothed[self.x_dict['z']])
 
-        self.p2.plot(t, x_smoothed[self.x_dict['q0']],pen=pen)
-        self.p2.plot(t, x_smoothed[self.x_dict['q1']],pen=pen)
-        self.p2.plot(t, x_smoothed[self.x_dict['q2']],pen=pen)
-        self.p2.plot(t, x_smoothed[self.x_dict['q3']],pen=pen)
+        self.q0_sm.setData(t, x_smoothed[self.x_dict['q0']])
+        self.q1_sm.setData(t, x_smoothed[self.x_dict['q1']])
+        self.q2_sm.setData(t, x_smoothed[self.x_dict['q2']])
+        self.q3_sm.setData(t, x_smoothed[self.x_dict['q3']])
 
-        self.p3.plot(t, x_smoothed[self.x_dict['v_x']], pen=pen)
-        self.p3.plot(t, x_smoothed[self.x_dict['v_y']], pen=pen)
-        self.p3.plot(t, x_smoothed[self.x_dict['v_z']], pen=pen)
+        self.u_sm.setData(t, x_smoothed[self.x_dict['v_x']])
+        self.v_sm.setData(t, x_smoothed[self.x_dict['v_y']])
+        self.w_sm.setData(t, x_smoothed[self.x_dict['v_z']])
 
-        self.p4.plot(t, x_smoothed[self.x_dict['p']], pen=pen)
-        self.p4.plot(t, x_smoothed[self.x_dict['q']], pen=pen)
-        self.p4.plot(t, x_smoothed[self.x_dict['r']], pen=pen)
+        self.p_sm.setData(t, x_smoothed[self.x_dict['p']])
+        self.q_sm.setData(t, x_smoothed[self.x_dict['q']])
+        self.r_sm.setData(t, x_smoothed[self.x_dict['r']])
 
         self.app.processEvents()
 

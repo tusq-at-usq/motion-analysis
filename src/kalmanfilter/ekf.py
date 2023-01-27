@@ -221,7 +221,7 @@ class ExtendedKalmanFilter():
         dt : float
             Time-step. NOTE: Currently not used
         """
-        dx = 1e-6
+        dx = 1e-8
 
         x0 = x.copy()
         #  x1 = self._fx(x0,dt)
@@ -294,7 +294,7 @@ class ExtendedKalmanFilter():
             the built in unless your residual computation is nonlinear (for
             example, if they are angles)
         """
-        PHT = self.P@H.T #np.dot(self.P, H.T)
+        PHT = self.P@(H.T) #np.dot(self.P, H.T)
         self.R = R
         self.S = H@PHT + R
         #  breakpoint()

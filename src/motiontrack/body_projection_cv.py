@@ -95,14 +95,14 @@ class CameraView:
         y = self.cal.project(x).T
         return y
 
-    def get_visible_blobs(self, angle_threshold: float=0.1):
+    def get_visible_blobs(self, angle_threshold: float=0.05):
         dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
         visible_surfs = np.where(dot_prods > angle_threshold)[0]
         visible_blobs = np.array([j for i in visible_surfs \
                                   for j in self.body.surface_blobs[i]])
         return visible_blobs
 
-    def get_blobs(self, angle_threshold: float=0.1) -> BlobsFrame:
+    def get_blobs(self, angle_threshold: float=0.05) -> BlobsFrame:
         """
         Get the pixel locations of blobs in 2-dimensional XY coordinates
 
@@ -136,7 +136,9 @@ class CameraView:
 
         return BlobsFrame(blob_2d, blob_sizes)
 
-    def get_mesh(self, angle_threshold:float=0.05) -> Tuple[np.array, np.array]:
+    def get_mesh(self,
+                 angle_threshold:float=0.05,
+                 visible_surfs = None) -> Tuple[np.array, np.array]:
         """
         Get the pixel locations of mesh in  2-dimensional XY coordinates
 
@@ -155,13 +157,24 @@ class CameraView:
         visible_angles: np.array
             A 1-dimensional numpy array with values of normal angle magnitude
         """
-        dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
-        visible_surfs = np.where(dot_prods > angle_threshold)[0]
+        if visible_surfs is None:
+            dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
+            visible_surfs = np.where(dot_prods > angle_threshold)[0]
         visible_mesh = self.body.to_2d_mesh(
             self._transform(self.body.to_vectors(self.body.vectors))
         )[visible_surfs]
+        #  visible_angles = dot_prods[visible_surfs]
+        return visible_mesh, visible_surfs
+
+    def get_uncorrected_mesh(self, angle_threshold: float=0) -> Tuple[np.array, np.array]:
+        dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
+        visible_surfs = np.where(dot_prods > angle_threshold)[0]
+        visible_mesh = self.body.to_2d_mesh(
+            self.cal.project_wo_distortion(self.body.to_vectors(self.body.vectors)).T
+        )[visible_surfs]
         visible_angles = dot_prods[visible_surfs]
         return visible_mesh, visible_angles
+
 
     def get_CoM(self) -> np.array:
         """

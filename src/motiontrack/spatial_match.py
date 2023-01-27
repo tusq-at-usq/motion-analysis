@@ -138,6 +138,7 @@ class SpatialMatch:
                 plot.update_projection(blobs_p)
                 plot.update_mesh(*frame_p)
                 plot.update_CoM(cent)
+                input("Press to continue")
                 #  time.sleep(0.01)
 
         C0 = np.ones(7) 
