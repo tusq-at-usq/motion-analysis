@@ -366,7 +366,7 @@ class UnscentedKalmanFilter():
 
     def predict(self,
                 dt: float,
-                x: np.array, 
+                x: np.array,
                 P: np.array,
                 Q: np.array,
                 u: np.array = np.array([])):
@@ -400,8 +400,7 @@ class UnscentedKalmanFilter():
         self.P_prior = np.copy(self.P)
 
         J = self.dsys.J_np(self.x_prior, u)
-        self.F = expm(J*dt)
-        return self.x_prior, self.P_prior, self.F
+        return self.x_prior, self.P_prior
 
     def update(self,
                y: np.array,
@@ -502,7 +501,7 @@ class UnscentedKalmanFilter():
             self._mahalanobis = np.sqrt(float(np.dot(np.dot(self.y.T, self.SI), self.y)))
         return self._mahalanobis
 
-    def rts_smoother(self, Xs, Ps, x_prs, P_prs, Qs, dts, quaternions=True):
+    def rts_smoother(self, Xs, Ps, Qs, dts, quaternions=True):
         """
         Runs the Rauch-Tung-Striebal Kalman smoother on a set of
         means and covariances computed by the UKF. The usual input
@@ -561,8 +560,6 @@ class UnscentedKalmanFilter():
         n = len(Xs)
         if not all(n_i == n for n_i in [len(Ps),
                                         len(Qs),
-                                        len(x_prs),
-                                        len(P_prs),
                                         len(Xs),
                                         len(dts)]):
             print("ERROR: RTS smoother inputs are not same length")

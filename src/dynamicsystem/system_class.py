@@ -99,8 +99,8 @@ class DynamicSystem:
     def write_config(self, config_name: str, x: np.array):
         if os.path.isfile(config_name+'.yaml'):
             print ("WARNING: Input file already exists")
-            rep = input("Override? (Y/N)")
-            if rep not in ['Y','y']:
+            rep = input("Overwrite? (Y/N)")
+            if rep[-1] not in ['Y','y']:
                 print("Not overwriting")
                 return
         new_state_dict = self.state_config_dict.copy()
@@ -133,6 +133,14 @@ class DynamicSystem:
             print('WARNING: Config system does not match dynamic system')
         x_0 = [x_i["X0"] for x_i in in_dict['States'].values()]
         return np.array(x_0)
+
+    def init(self, config_name: str):
+
+        self.load_config(config_name)
+        self.add_aug_states(config_name)
+        self.sub_params(config_name)
+        self.create_jacobian()
+        self.lambdify()
 
     def load_config(self, config_name: str) -> Tuple[dict, dict, dict, dict]:
         """
@@ -173,6 +181,7 @@ class DynamicSystem:
                 aug_states[P[0]] = P[1]
         self.state_config_dict = in_dict["States"]
         self.param_config_dict = in_dict["Parameters"]
+
         return states, params, inputs, aug_states
 
     def add_aug_states(self, config_name: str):

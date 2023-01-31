@@ -115,7 +115,9 @@ def quaternion_multiply(q_mul: np.array, q0: np.array) -> np.array:
     Q0 = quaternion_to_matrix(q0)
     Q_mul = quaternion_to_matrix(q_mul)
     Q2 = Q_mul@Q0
-    return Q2[:,0]
+    q2 = Q2[0,:]
+    q2 = q2/np.linalg.norm(q2)
+    return q2
 
 def quaternion_subtract(q0: np.array, q_sub: np.array) -> np.array:
     """
@@ -141,7 +143,9 @@ def quaternion_subtract(q0: np.array, q_sub: np.array) -> np.array:
     Q0 = quaternion_to_matrix(q0)
     Q_sub = quaternion_to_matrix(q_sub)
     Q_diff = Q0 @ np.linalg.inv(Q_sub)
-    return Q_diff[0,:]
+    q2 = Q_diff[0,:]
+    q2 = q2/np.linalg.norm(q2)
+    return q2
 
 #  def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
 def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
@@ -174,7 +178,9 @@ def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
         + np.sin(psi/2) * np.cos(theta/2) * np.sin(phi/2)
     q3 = np.sin(psi/2) * np.cos(theta/2) * np.cos(phi/2) \
         - np.cos(psi/2) * np.sin(theta/2) * np.sin(phi/2)
-    return q0, q1, q2, q3
+    Q = np.array([q0, q1, q2, q3])
+    Q = Q/np.linalg.norm(Q)
+    return Q
 
 def quaternion_to_euler(q0: float, q1: float, q2: float, q3: float) \
         -> List[float]:
