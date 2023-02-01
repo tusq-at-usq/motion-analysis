@@ -1,0 +1,87 @@
+System-name: default_name
+States:
+  x:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.058
+  y:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.002
+  z:
+    Min: -1.0
+    Max: 1.0
+    X0: -0.732
+  q0:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.5419005328441193
+  q1:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.014840155049959499
+  q2:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.023787355570640285
+  q3:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.8399748472521715
+  v_x:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+  v_y:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+  v_z:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+  p:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+  q:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+  r:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+  a_x:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+  a_y:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+  a_z:
+    Min: -1.0
+    Max: 1.0
+    X0: 0.0
+Parameters:
+  I_13:
+    Type: Param
+    X0: 0.0
+    Min: '-'
+    Max: '-'
+  I_11:
+    Type: Param
+    X0: 3.0375e-05
+    Min: '-'
+    Max: '-'
+  I_33:
+    Type: Param
+    X0: 3.0375e-05
+    Min: '-'
+    Max: '-'
+  I_2:
+    Type: Param
+    X0: 3.0375e-05
+    Min: '-'
+    Max: '-'
