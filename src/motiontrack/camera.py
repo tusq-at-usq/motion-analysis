@@ -28,10 +28,106 @@ First created: Jan 2022
 from typing import List, Tuple
 import numpy as np
 
-from motiontrack.utils import euler_to_quaternion, quaternion_to_rotation_tensor
+from motiontrack.utils import euler_to_quaternion
 from motiontrack.blob_data import BlobsFrame
 from motiontrack.geometry import BodySTL
-from motiontrack.custom_types import CameraCalibration
+
+class CameraCalibration:
+    def __init__(self, mtx, dist, R=np.eye(3), T=np.array([0.,0.,0.]), parallel=0, scale=1):
+        self.mtx = mtx
+        self.dist = dist
+        self.R = R # Rotation from camera 2 to camera 1
+        self.T = T # Translation from camera 2 to camera 1
+        self.R_L = np.eye(3) # Rotation from C1 openCV to local coordiantes
+        self.parallel = parallel
+        self.scale = scale
+
+
+    def init(self):
+        self.dist = np.pad(self.dist[0],(0,14-self.dist.shape[1]))
+        tau_x = self.dist[12]
+        tau_y = self.dist[13]
+        R_ = np.array([[np.cos(tau_y), np.sin(tau_y)*np.sin(tau_x), -np.sin(tau_y)*np.cos(tau_x)],
+                      [0, np.cos(tau_x), np.sin(tau_x)],
+                      [np.sin(tau_y), -np.cos(tau_y)*np.sin(tau_x), np.cos(tau_y)*np.cos(tau_x)]])
+        self.R_cor = np.array([[R_[2,2], 0, -R_[0,2]],
+                               [0, R_[2,2], -R_[1,2]],
+                               [0, 0, 1]]) @ R_
+
+    def set_intrinsic(self, mtx, dist, scale=1):
+        self.mtx = mtx
+        self.dist = dist
+        self.scale = scale
+        self.init()
+
+    def set_extrinsic(self, R, T):
+        self.R = R
+        self.T = T
+        
+    def set_all(self, mtx, dist, R, T, scale=1):
+        self.set_intrinsic(mtx, dist, scale)
+        self.set_extrinsic(R, T)
+
+
+    # Outdated opencv implementation
+    #  def _project(self, X, R_C=None):
+        #  if R_C is None:
+            #  R_C = self.R
+        #  Y = cv.projectPoints(self.R_L@X, R_C, self.T, self.mtx, self.dist)
+        #  Y = Y[0].reshape(-1,2)
+        #  return Y
+
+
+    def project_wo_distortion(self, X):
+        X_ = self.R_L@X
+        P_w = np.vstack((X_,np.full(X_.shape[1],1)))
+        RT = np.hstack((self.R,self.T.reshape(-1,1)))
+        P_c = RT@P_w
+        Z_c = P_c[2]
+        xy = P_c/Z_c
+        Y = self.mtx@xy
+        Y /= Y[2]
+        Y = Y[0:2].T.reshape(-1,2)
+        return Y
+
+    def _project(self, X, R_C=None, T = None):
+        if R_C is None:
+            R_C = self.R
+        if T is None:
+            T = self.T
+        X_ = self.R_L@X
+        P_w = np.vstack((X_,np.full(X_.shape[1],1)))
+        RT = np.hstack((R_C,T.reshape(-1,1)))
+        P_c = RT@P_w
+        Z_c = P_c[2]
+        if self.parallel:
+            xy = P_c/self.scale
+            xy[2] = np.full(xy.shape[1],1)
+        else:
+            xy = P_c/Z_c
+        r2 = (xy[0]**2 + xy[1]**2)
+
+        dist = self.dist
+        t1 = (1 + dist[0]*r2 + dist[1]*r2**2 + dist[4]*r2**3)/ \
+            (1 + dist[5]*r2 + dist[6]*r2**2 + dist[7]*r2**3)
+        tx1 = 2*dist[2]*xy[0]*xy[1]
+        ty2 = 2*dist[3]*xy[0]*xy[1]
+        tx2 = dist[3]*(r2 + 2*xy[0]**2)
+        ty1 = dist[2]*(r2 + 2*xy[1]**2)
+
+        xy_cor = np.full(xy.shape,1.)
+        xy_cor[0,:] = xy[0]*t1 + tx1 + tx2 + dist[8]*r2 + dist[9]*r2**2
+        xy_cor[1,:] = xy[1]*t1 + ty1 + ty2 + dist[10]*r2 + dist[11]*r2**2
+
+        xy_cor2 = self.R_cor@xy_cor
+        Y = self.mtx@xy_cor2
+        Y /= Y[2]
+        Y = Y[0:2].T.reshape(-1,2)
+        return Y
+
+    def project(self, X, R_C=None, T = None):
+        return self._project(X, R_C, T)
+
 
 class CameraView:
     """
@@ -137,8 +233,8 @@ class CameraView:
         return BlobsFrame(blob_2d, blob_sizes)
 
     def get_mesh(self,
-                 angle_threshold:float=0.05,
-                 visible_surfs = None) -> Tuple[np.array, np.array]:
+                 angle_threshold: float=0.05,
+                 visible_surfs: np.array = None) -> Tuple[np.array, np.array]:
         """
         Get the pixel locations of mesh in  2-dimensional XY coordinates
 
@@ -166,9 +262,13 @@ class CameraView:
         #  visible_angles = dot_prods[visible_surfs]
         return visible_mesh, visible_surfs
 
-    def get_uncorrected_mesh(self, angle_threshold: float=0) -> Tuple[np.array, np.array]:
-        dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
-        visible_surfs = np.where(dot_prods > angle_threshold)[0]
+    def get_uncorrected_mesh(self,
+                             angle_threshold: float=0,
+                             visible_surfs: np.array = None) -> Tuple[np.array, np.array]:
+
+        if visible_surfs is None:
+            dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
+            visible_surfs = np.where(dot_prods > angle_threshold)[0]
         visible_mesh = self.body.to_2d_mesh(
             self.cal.project_wo_distortion(self.body.to_vectors(self.body.vectors)).T
         )[visible_surfs]
