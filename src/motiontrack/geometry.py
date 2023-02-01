@@ -181,7 +181,8 @@ class BodySTL:
     def plot(self):
         #TODO: This could be cleaned up, to remove attribute checking
         if not hasattr(self, 'fig'):
-            self.fig = vpl.QtFigure(name='Body mesh plot')
+            #  self.fig = vpl.QtFigure(name='Body mesh plot')
+            self.fig = vpl.figure(name='Body mesh plot')
             self.fig.camera.SetParallelProjection(1)
             self.q0 = np.array([1, 0, 0, 0])
             self.view_dict = vpl.view(camera_direction=[0,0,-1], up_view=[1, 0, 0])

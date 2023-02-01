@@ -1,7 +1,8 @@
 import sys
 import numpy as np
+import PyQt6
+from pyqtgraph import PlotWidget, plot, QtCore
 import pyqtgraph as pg
-from pyqtgraph import QtCore
 
 class PlotMatch:
     def __init__(self, name, resolution=None):
@@ -13,6 +14,7 @@ class PlotMatch:
 
         # Create the main application instance
         self.app = pg.mkQApp()
+        #  self.app = QtWidgets.QApplication(sys.argv)
         pg.setConfigOptions(antialias=True)
 
         # Create the view
@@ -83,7 +85,8 @@ class PlotMatch:
         y = np.ravel((line_st[:,1],line_en[:,1]),'F')
 
         connect = np.array([True, False]*int(len(x)/2))
-        self.edges.setData(x,self.invert(y),connect=connect[:-1])    
+        #  self.edges.setData(x,self.invert(y),connect=connect[:-1])    
+        self.edges.setData(x,self.invert(y),connect=connect)    
         self.app.processEvents()
 
     def update_image(self, im):
@@ -153,7 +156,8 @@ class PlotTrack:
         self.r = pg.PlotCurveItem(pen=pg.mkPen(10, width=1))
 
 
-        sm_pen = pg.mkPen(0.2, style=QtCore.Qt.DashLine, width=1)
+        sm_pen = pg.mkPen(0.2, style=QtCore.Qt.PenStyle.DashLine, width=1)
+        #  sm_pen = pg.mkPen(0.2, style=Qt.Qt.DashLine, width=1)
         self.x_sm = pg.PlotCurveItem(pen=sm_pen)
         self.y_sm = pg.PlotCurveItem(pen=sm_pen)
         self.z_sm = pg.PlotCurveItem(pen=sm_pen)
