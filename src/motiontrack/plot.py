@@ -1,5 +1,4 @@
 import sys
-
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtCore
@@ -22,8 +21,8 @@ class PlotMatch:
         self.y = 1024
         if resolution != None:
             self.view.resize(resolution[0], resolution[1])
-            self.view.setXRange(0, resolution[0], padding=0)
-            self.view.setYRange(0, resolution[1], padding=0)
+            self.view.setXRange(0, resolution[0])
+            self.view.setYRange(0, resolution[1])
             self.y = resolution[1]
 
         self.view.setWindowTitle(name)
@@ -38,7 +37,6 @@ class PlotMatch:
         self.blob_CoM = pg.ScatterPlotItem(pen=pg.mkPen(width=15, color='g'),
                                            symbol='o', size=1)
 
-        #  self.blob_ass = pg.PlotCurveItem(pen=pg.mkPen(width=1), connect='pairs')
         self.frame_pr = pg.PlotCurveItem(pen=pg.mkPen(width=1))
         self.edges = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='orange'))
 
@@ -48,7 +46,6 @@ class PlotMatch:
         self.view.addItem(self.blob_ob)
         self.view.addItem(self.blob_pr)
         self.view.addItem(self.blob_CoM)
-        #  self.view.addItem(self.blob_ass)
         self.view.addItem(self.frame_pr)
         self.view.addItem(self.edges)
 
@@ -69,12 +66,6 @@ class PlotMatch:
         blob_x = blob_data.points
         self.blob_pr.setData(blob_x[:,0], self.invert(blob_x[:,1]))
         self.app.processEvents()
-
-    #TODO: Add plotting over image data
-
-    #  def update_assocation(self, pair_data):
-        #  self.blob_ass.setData(pair_data[:,0], pair_data[:,1])
-        #  self.app.processEvents()
 
     def update_mesh(self, mesh, angles):
         mesh_dim = mesh.shape[2]

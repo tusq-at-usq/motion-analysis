@@ -29,7 +29,7 @@ from typing import List, Tuple
 import numpy as np
 
 from motiontrack.utils import euler_to_quaternion
-from motiontrack.blob_data import BlobsFrame
+from motiontrack.features import BlobsFrame
 from motiontrack.geometry import BodySTL
 
 class CameraCalibration:
