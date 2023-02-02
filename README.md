@@ -1,64 +1,67 @@
 # USQ motion analysis codes
 
-A selection of Python tools used to analyse object motion, intended predominantly for experimental motion data. Multiple types of observations (image blobs detection, IMU etc.) can be combined to estimate the state of the system at the current time point. 
+A selection of Python tools used to analyse object motion, predominantly to extract aerodynamic acceleration data. 
 
-Future development will also incorporate data smoothing, so that forces and
-moments can be extracted from the motion data. 
+The broad idea is to combine many measurements into a Bayesian filter to estimate the most probably state at each point in time.
 
-![alt_text](/docs/img/example_gif.gif?raw=true "example")
-*The above shows an example of 6DoF tracking of a cube using blob tracking from
-two camera viewpoints. Noise error was added to simulated image data, and the 
-system dynamics used by the Kalman filter is deliberately inaccurate. 
-Grey lines show the 'true' solution*
+## Contents
+
+This package is separated into 4 parts:
+- [`dynamicsystem`](/src/dynamicsystem/README.md) provides a dynamic system builder and container, with associated tools.
+- [`motiontrack`](/src/motiontrack/README.md) handles body geometry, body camera projection, and overhead functions to combine multiple observations.
+- [`kalmanfilter`](/src/kalmanfilter/README.md) provides nonlinear Kalman filters and smoothers.
+- [`cameracalibration`](/src/camera_cal/README.md) provides individual and stereo camera calibration utilities 
+
+In typical usage, these four parts would interact as below.
+![alt text](/docs/img/block_diagram.png)
 
 ## Install
 
 Clone the repository:
 `git clone https://github.com/tusq-at-usq/motion-analysis`
 
-Install using pip in editable mode:
+Install the package (recommended in virtual environment):
+`python3 -m pip install ./`
+or if you plan to make changes, or wish to view the example codes, it is recommended to install using pip in editable mode:
 `python3 -m pip install -e ./`
 
-Please contact Andy (andrew.lock@usq.edu.au) if you encounter any install issues.
+Please [contact Andy](mailto:andrew.lock@usq.edu.au) if you encounter any install issues.
 
-## Contents
+## Dependencies
 
-This repository contains the following Python packages
+All dependencies should be installed as part of the pip installation.
 
-* [`motiontrack`](/src/motiontrack/README.md)
-* [`blobdetect`](/src/blobdetect/README.md)
-* [`dynamicsystem`](/src/dynamicsystem/README.md)
-* [`kalmanfilter`](/src/kalmanfilter/README.md)
-* (more to be included)
-
-## Dependencies 
-
-Most dependencies should be automatically installed during the package install.
-If you encounter unmet dependencies, please contact Andy. 
+*___Note___: This package requires the graphics package `PyQt6`, and therefore also requires Python version >= 3.10.
+It is possible to use older Python versions with `PyQt5`, however often this conflicts with other packages also using `PyQT5`. 
+If you wish to install using an older version of Python, please [contact Andy](mailto:andrew.lock@usq.edu.au) for details how.*
 
 ## Documentation 
 
-Documentation to be added to [`docs`](/docs/).
+Documentation for the theory and usage of this package is provided in the  [`/docs`](/docs/).
 
-A description of each package is provided in the `README` of each package. 
+In addition, a short description of each package is provided in the `README.md` of each package. 
 
 ## Tests
 
-The tests directory contains scripts to test the functionality of individual modules, and should be used when modifying core modules. 
+The [`tests/`](/tests) directory provides a suite of test codes designed to run with [pytest](https://docs.pytest.org/).
+
+Note the test modules are currently under active development.
 
 ## Examples
 
-Examples of how the different packages integrate to track dynamic systems.
-Include
+Examples are provided in [`examples/`](/examples/). Currently the examples include:
+- Stereo tracking of a cube dropped in free fall ([drop test](/examples/drop_example))
 
-- 3DoF tracking from XYZ data
-- 6DoF tracking from XYZ and quaternion data
-- 6DoF tracking from 2-D projected blob data from a cube
+More to come...
 
-## Example structure of tracker design
+## Roadmap
 
-The below flowchart shows an example structure 
+motion-analysis is being developed along the following roadmap.
 
-![alt text](/docs/img/motiontrack_diagram.png?raw=true "motiontrack_structure")
+* [ ] Create block-based dynamic system builder
+* [ ] Provide more examples
+* [ ] Provide test modules and auto-test on push
+
+
 
 
