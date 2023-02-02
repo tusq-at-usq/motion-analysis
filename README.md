@@ -10,7 +10,7 @@ This package is separated into 4 parts:
 - [`dynamicsystem`](/src/dynamicsystem/README.md) provides a dynamic system builder and container, with associated tools.
 - [`motiontrack`](/src/motiontrack/README.md) handles body geometry, body camera projection, and overhead functions to combine multiple observations.
 - [`kalmanfilter`](/src/kalmanfilter/README.md) provides nonlinear Kalman filters and smoothers.
-- [`cameracalibration`](/src/camera_cal/README.md) provides individual and stereo camera calibration utilities 
+- [`camcal`](/src/camcal/README.md) provides individual and stereo camera calibration utilities 
 
 In typical usage, these four parts would interact as below.
 ![alt text](/docs/img/block_diagram.png)
