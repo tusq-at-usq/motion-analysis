@@ -19,15 +19,21 @@ In typical usage, these four parts would interact as below.
 
 Clone the repository:
 
-```git clone https://github.com/tusq-at-usq/motion-analysis```
+```
+git clone https://github.com/tusq-at-usq/motion-analysis
+```
 
 Install the package (recommended in virtual environment):
 
-```python3 -m pip install ./```
+```
+python3 -m pip install ./
+```
 
-or if you plan to make changes, or wish to view the example codes, it is recommended to install using pip in editable mode:
+Or if you plan to make changes, or wish to view the example codes, it is recommended to install using pip in editable mode:
 
-```python3 -m pip install -e ./```
+```
+python3 -m pip install -e ./
+```
 
 Please [contact Andy](mailto:andrew.lock@usq.edu.au) if you encounter any install issues.
 
@@ -47,20 +53,20 @@ In addition, a short description of each package is provided in the `README.md` 
 
 ## Tests
 
-The [`tests/`](/tests) directory provides a suite of test codes designed to run with [pytest](https://docs.pytest.org/).
+The [`tests/`](/tests/) directory provides a suite of test codes designed to run with [pytest](https://docs.pytest.org/).
 
 Note the test modules are currently under active development.
 
 ## Examples
 
 Examples are provided in [`examples/`](/examples/). Currently the examples include:
-- Stereo tracking of a cube dropped in free fall ([drop test](/examples/drop_example))
+- Stereo tracking of a cube dropped in free fall ([drop test](/examples/drop_example/))
 
 More to come...
 
 ## Roadmap
 
-motion-analysis is being developed along the following roadmap.
+motion-analysis is being developed along the following roadmap:
 
 * [ ] Create block-based dynamic system builder
 * [ ] Provide more examples
