@@ -18,12 +18,16 @@ In typical usage, these four parts would interact as below.
 ## Install
 
 Clone the repository:
-`git clone https://github.com/tusq-at-usq/motion-analysis`
+
+```git clone https://github.com/tusq-at-usq/motion-analysis```
 
 Install the package (recommended in virtual environment):
-`python3 -m pip install ./`
+
+```python3 -m pip install ./```
+
 or if you plan to make changes, or wish to view the example codes, it is recommended to install using pip in editable mode:
-`python3 -m pip install -e ./`
+
+```python3 -m pip install -e ./```
 
 Please [contact Andy](mailto:andrew.lock@usq.edu.au) if you encounter any install issues.
 
