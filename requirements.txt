@@ -8,6 +8,6 @@ PyYAML==6.0
 quadpy==0.16.22
 scipy==1.8.0
 setuptools==59.6.0
-stl==0.0.3
+stl==0.0.3 --install-option'--use-pep517'
 sympy==1.11.1
 vtkplotlib==2.0.0
