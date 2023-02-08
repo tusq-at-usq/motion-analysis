@@ -5,7 +5,6 @@ pandas==1.4.3
 Pillow==9.4.0
 pyqtgraph==0.13.1
 PyYAML==6.0
-quadpy==0.16.22
 scipy==1.8.0
 setuptools==59.6.0
 stl==0.0.3 --install-option='--use-pep517'
