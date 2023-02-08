@@ -1,6 +1,6 @@
-from sysopt import Block, Metadata, Composite
-from sysopt.solver import SymbolDatabase
-from sysopt.backends import simplify_system
+from sysopt_symbolic import Block, Metadata, Composite
+from sysopt_symbolic.solver import SymbolDatabase
+from sysopt_symbolic.backends import simplify_system
 from dynamicsystem import DynamicSystem
 
 class Position(Block):
@@ -103,5 +103,5 @@ model = DoF3()
 backend = SymbolDatabase()
 X, P, f, sym_dict = simplify_system(backend,model)
 
-S = DynamicSystem(X,P,f,sym_dict)
-S.save("DoF3")
+dsys = DynamicSystem(X,P,f,sym_dict)
+dsys.save("DoF3")

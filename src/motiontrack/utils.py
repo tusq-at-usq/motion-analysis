@@ -216,3 +216,8 @@ def quaternion_to_euler(q0: float, q1: float, q2: float, q3: float) \
            (q0**2 - q1**2 - q2**2 + q3**2))
     # TODO: Need to adjust code to manage singularities at psi = +/- pi/2 and phi = +/- pi/2
     return psi, theta, phi
+
+def euler_to_rotation_tensor(psi: float, theta: float, phi: float) -> np.array:
+    Q = euler_to_quaternion(psi, theta, phi)
+    R = quaternion_to_rotation_tensor(*Q)
+    return R

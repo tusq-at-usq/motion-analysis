@@ -204,8 +204,7 @@ class ExtendedKalmanFilter():
                            x: np.array,
                            u: np.array,
                            n_z: int,
-                           hx: Callable,
-                           dt: float):
+                           hx: Callable):
         """
         Internal function to create a Jacobian matrix of the observation
         function.

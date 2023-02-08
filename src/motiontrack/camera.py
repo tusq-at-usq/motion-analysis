@@ -33,18 +33,30 @@ from motiontrack.features import BlobsFrame
 from motiontrack.geometry import BodySTL
 
 class CameraCalibration:
-    def __init__(self, mtx, dist, R=np.eye(3), T=np.array([0.,0.,0.]), parallel=0, scale=1):
+    def __init__(self,
+                 mtx,
+                 dist,
+                 R=np.eye(3),
+                 T=np.array([0.,0.,0.]),
+                 R_L=np.eye(3),
+                 parallel=0,
+                 scale=1):
         self.mtx = mtx
+        # OpenCV outputs dist as a 1xn 2-dimensional vector by default
+        if dist.ndim > 1:
+            dist = dist[0]
         self.dist = dist
         self.R = R # Rotation from camera 2 to camera 1
         self.T = T # Translation from camera 2 to camera 1
-        self.R_L = np.eye(3) # Rotation from C1 openCV to local coordiantes
+        self.R_L = R_L # Rotation from C1 openCV to local coordiantes
         self.parallel = parallel
         self.scale = scale
 
+        self.init()
+
 
     def init(self):
-        self.dist = np.pad(self.dist[0],(0,14-self.dist.shape[1]))
+        self.dist = np.pad(self.dist,(0,14-self.dist.shape[0]))
         tau_x = self.dist[12]
         tau_y = self.dist[13]
         R_ = np.array([[np.cos(tau_y), np.sin(tau_y)*np.sin(tau_x), -np.sin(tau_y)*np.cos(tau_x)],
