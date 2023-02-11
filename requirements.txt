@@ -9,4 +9,5 @@ scipy
 setuptools
 stl --install-option='--use-pep517'
 sympy
+vtk
 vtkplotlib
