@@ -25,8 +25,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name : Install apt dependencies
-        run: sudo apt-get install -y libopenblas-dev
-        run: sudo apt-get install libvtk5-dev python-vtk
+        run: | 
+          sudo apt-get install -y libopenblas-dev
+          sudo apt-get install libvtk5-dev python-vtk
 
       - name: Install dependencies
         run: |
