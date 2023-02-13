@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ['ubuntu-20.04']
+        os: ['ubuntu-22.04']
         python-version: ["3.10.6"]
     steps:
       - name: Check out repository code
@@ -31,6 +31,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python3 -V
           python3 -m pip install --upgrade pip
           python3 -m pip install -r test-requirements.txt 
           python3 -m pip install -r requirements.txt
