@@ -8,6 +8,6 @@ pyqtgraph
 PyYAML
 scipy
 setuptools
-stl --install-option='--use-pep517'
+stl
 sympy
 vtkplotlib
