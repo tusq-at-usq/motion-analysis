@@ -6,7 +6,7 @@ import numpy as np
 #  from motiontrack.geometry_stl import BodySTL
 from motiontrack.geometry import BodySTL
 
-STL_PATH = os.path.join(os.path.dirname(__file__), 'data/cube.stl')
+STL_PATH = os.path.join(os.path.dirname(__file__),'cube.stl')
 
 def make_cube():
     body = BodySTL()
