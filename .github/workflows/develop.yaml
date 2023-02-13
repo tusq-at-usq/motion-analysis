@@ -27,7 +27,7 @@ jobs:
       - name : Install apt dependencies
         run: | 
           sudo apt-get install -y libopenblas-dev
-          sudo apt install vtk9
+          # sudo apt install vtk9
 
       - name: Install dependencies
         run: |
