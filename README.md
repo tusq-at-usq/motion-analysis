@@ -39,7 +39,14 @@ Please [contact Andy](mailto:andrew.lock@usq.edu.au) if you encounter any instal
 
 ## Dependencies
 
-All dependencies should be installed as part of the pip installation.
+You will first need to install two apt dependencies:
+
+```
+sudo apt install libopenblas-dev 
+sudo apt install libegl1-mesa
+```
+
+All other dependencies should be installed as part of the pip installation.
 
 *___Note___: This package requires the graphics package `PyQt6`, and therefore also requires Python version >= 3.10.
 It is possible to use older Python versions with `PyQt5`, however often this conflicts with other packages also using `PyQT5`. 
