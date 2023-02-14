@@ -6,14 +6,15 @@ The broad idea is to combine many measurements into a Bayesian filter to estimat
 
 ## Contents
 
-This package is separated into 4 parts:
+This package is separated into 3 parts:
 - [`dynamicsystem`](/src/dynamicsystem/README.md) provides a dynamic system builder and container, with associated tools.
 - [`motiontrack`](/src/motiontrack/README.md) handles body geometry, body camera projection, and overhead functions to combine multiple observations.
 - [`kalmanfilter`](/src/kalmanfilter/README.md) provides nonlinear Kalman filters and smoothers.
-- [`camcal`](/src/camcal/README.md) provides individual and stereo camera calibration utilities 
 
 In typical usage, these four parts would interact as below.
 ![alt text](/docs/img/block_diagram.png)
+
+Camera calibration example scripts are also stored in the repository [`camera-cal`](https://github.com/tusq-at-usq/camera-cal).
 
 ## Install
 
