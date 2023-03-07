@@ -4,7 +4,7 @@
 
 The local level coordinate system is used for geometry and projection, and is defined as:
 
-            /|\ 1 (north/forwards)
+           / | \ 1 (north/forwards)
              |
              |
      <-------o 2 ( west/left)
@@ -16,7 +16,7 @@ In coordinate system is used for dynamical systems, and is defined as:
     | \
     |   \
     |    _\| 2 (right wing)
-    \/
+   \ /
    3 (down)
 
 TODO: Add conversion between local and dynamics coordinate system

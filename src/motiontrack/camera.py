@@ -5,7 +5,7 @@
 Note that all geometry creation/projection is done in local coordinates
 The local level coordinate system is defined as:
 
-          /|\ 1 (Forward/North)
+         / | \ 1 (Forward/North)
            |
            |
    <-------o 3 (Upwards/out of earth)
@@ -17,7 +17,7 @@ Thsi shouldn't be confused with common body coordiante system such as the vehicl
     | \
     |   \
     |    _\| 2 (right wing)
-    \/
+   \ /
    3 (down)
 
 
