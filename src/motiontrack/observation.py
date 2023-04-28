@@ -30,10 +30,8 @@ class Observation:
         self.name = name
         self.size = size
         self.ob_names = ob_names
-        self.index = 0
         self.z_history = []
         self.y_history = []
-        self.t_history = []
         self.tau_history = []
 
         if ob_names is None:
@@ -93,9 +91,7 @@ class Observation:
         x_dict : dict
             State index dictionary with format {<name>: <index>}
         """
-        t, y, tau = self._next_measurement(x_pr, x_dict)
-        self.index += 1
-        self.t_history.append(t)
+        y, tau = self._next_measurement(x_pr, x_dict)
         self.y_history.append(y)
         self.tau_history.append(tau)
         return y, tau
@@ -140,12 +136,6 @@ class Observation:
     def get_y(self):
         """ Return measurement vector """
         return self.y_history[-1]
-
-    def get_t(self):
-        """ Return current time """
-        if len(self.t_history) == 0:
-            return -1
-        return self.t_history[-1]
 
     def get_nz(self):
         """ Return number of observables """
@@ -263,11 +253,15 @@ def get_next_obs_group(obs_all: List[Observation], t: float, dt_min: float)\
     ts = []
     for ob in obs_all:
         ts.append(ob.get_next_t())
-    t_min = np.min(ts)
-    if t_min == np.Inf:
-        return np.Inf, [], 0
-    obs_next = [obs_all[i] for i in range(len(obs_all)) if ts[i]-t_min<dt_min]
+    obs_next = [obs_all[i] for i in range(len(obs_all)) if np.abs(ts[i]-t)<dt_min]
     nz = np.sum([ob.get_nz() for ob in obs_next])
-    return t_min, obs_next, nz
+    return obs_next, nz
 
+
+def get_next_t(data_iterators, t: float):
+    ts = []
+    for d in data_iterators:
+        ts.append(d.next_t)
+    t_min = np.min(ts)
+    return t_min
 

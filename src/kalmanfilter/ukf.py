@@ -26,6 +26,8 @@ from filterpy.kalman import MerweScaledSigmaPoints
 
 from dynamicsystem.system_class import DynamicSystem
 
+from motiontrack.utils import *
+
 def unscented_transform(sigmas, Wm, Wc, noise_cov=None,
                         mean_fn=None, residual_fn=None):
     r"""
@@ -111,10 +113,10 @@ def unscented_transform(sigmas, Wm, Wc, noise_cov=None,
             x = np.dot(Wm, sigmas)    # dot = \Sigma^n_1 (W[k]*Xi[k])
         else:
             x = mean_fn(sigmas, Wm)
+            x_ = np.dot(Wm, sigmas)    # dot = \Sigma^n_1 (W[k]*Xi[k])
     except:
         print(sigmas)
         raise
-
 
     # new covariance is the sum of the outer product of the residuals
     # times the weights
@@ -144,7 +146,7 @@ class UnscentedKalmanFilter():
     various checks in place to ensure that you have made everything the
     'correct' size. However, it is possible to provide incorrectly sized
     arrays such that the linear algebra can not perform an operation.
-    It can also fail silently - you can end up with matrices of a size that
+    t can also fail silently - you can end up with matrices of a size that
     allows the linear algebra to work, but are the wrong shape for the problem
     you are trying to solve.
     Parameters
@@ -240,13 +242,40 @@ class UnscentedKalmanFilter():
 
         self.msqrt = cholesky
 
-        self.sigma_points_fn = MerweScaledSigmaPoints(dsys.get_nx(), alpha=.1, beta=2., kappa=-1)
+        #  self.sigma_points_fn = MerweScaledSigmaPoints(dsys.get_nx(), alpha=.1, beta=2., kappa=-1)
+        self.sigma_points_fn = MerweScaledSigmaPoints(dsys.get_nx(), alpha=0.001, beta=2., kappa=0.)
         self._num_sigmas = self.sigma_points_fn.num_sigmas()
         self.Wm = self.sigma_points_fn.Wm
         self.Wc = self.sigma_points_fn.Wc
 
         self.residual_x = np.subtract
         self.residual_y = np.subtract
+
+        # DEBUG
+        # Testign custom residual function
+        def residual_x(x_, x):
+            dx = x_ - x
+            #  dx[3:7] = dx[3:7]/np.linalg.norm(dx[3:7])
+            x[3:7] = x[3:7]/np.linalg.norm(x[3:7])
+            x_[3:7] = x_[3:7]/np.linalg.norm(x_[3:7])
+            dx[3:7] = quaternion_subtract(x_[3:7], x[3:7])
+            #  dx[3:7] = dx[3:7]/np.linalg.norm(dx[3:7]) - np.array([1, 0, 0, 0])
+            #  print(dx[3:7])
+            return dx
+        #  self.residual_x = residual_x
+
+        def mean_fn(sigmas, Wm):
+            Wm = np.array(Wm)/np.sum(Wm)
+            x = np.dot(Wm, sigmas)    # dot = \Sigma^n_1 (W[k]*Xi[k])
+            qs = [s[3:7] for s in sigmas]
+            q_av = quaternion_weighted_av(qs,Wm)*-1
+            x[3:7] = q_av[:]
+            return x
+        
+        #  self.mean_fn = mean_fn
+        self.mean_fn = None
+
+
 
     def _fx(self,X, u, dt):
         # Note: Inputs not yet supported
@@ -344,9 +373,10 @@ class UnscentedKalmanFilter():
         fx = self._fx
 
         # calculate sigma points for given mean and covariance
+        # DEBUG:
         sigmas = self.sigma_points_fn.sigma_points(x, P)
-
-
+        #  sigmas[:,3:7] = sigmas[:,3:7]/np.linalg.norm(sigmas[:,3:7], axis=1)[:,None]
+        
         self.sigmas_f = np.zeros((self._num_sigmas, self.dsys.get_nx()))
         for i, s in enumerate(sigmas):
             self.sigmas_f[i] = fx(s, u, dt)
@@ -392,7 +422,8 @@ class UnscentedKalmanFilter():
 
         self.compute_process_sigmas(dt, x, P, u)
 
-        self.x, self.P = unscented_transform(self.sigmas_f, self.Wm, self.Wc, Q)
+        self.x, self.P = unscented_transform(self.sigmas_f, self.Wm, self.Wc, Q,
+                                             residual_fn=self.residual_x, mean_fn = self.mean_fn)
         if self.quaternions:
             self.x = self._normalise_q(self.x)
 

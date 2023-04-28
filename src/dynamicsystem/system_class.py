@@ -87,7 +87,7 @@ class DynamicSystem:
         X_def_dict = {}
         P_def_dict = {}
         for X_i in self.X:
-            X_def_dict[self.sym_dict[X_i]] = {'Min':-1.,'Max':1.,'X0':0.}
+            X_def_dict[self.sym_dict[X_i]] = {'Min':-1.,'Max':1.,'X0':0.001}
         for P_i in self.P:
             P_def_dict[self.sym_dict[P_i]] = {'Type':'Param','X0':1.,'Min':'-','Max':'-'}
         default_dict = {'System-name':self.name,'States':X_def_dict,'Parameters':P_def_dict}

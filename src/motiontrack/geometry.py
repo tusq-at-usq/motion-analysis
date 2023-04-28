@@ -4,7 +4,7 @@
 
 The local level coordinate system is used for geometry and projection, and is defined as:
 
-           / | \ 1 (north/forwards)
+            /|\ 1 (north/forwards)
              |
              |
      <-------o 2 ( west/left)
@@ -16,7 +16,7 @@ In coordinate system is used for dynamical systems, and is defined as:
     | \
     |   \
     |    _\| 2 (right wing)
-   \ /
+    \/
    3 (down)
 
 TODO: Add conversion between local and dynamics coordinate system
@@ -36,20 +36,31 @@ import stl
 import vtkplotlib as vpl
 from motiontrack.utils import *
 
+class ArucoMarker:
+    def __init__(self, aruco_id: int, points: np.array, surface: int, R: np.array = np.eye(3)):
+        # TODO: Add rotational vector for initialisation
+        self.aruco_id = aruco_id
+        self.points = points
+        self.surface = surface
+        self.R = R
+
 class BodySTL:
     def __init__(self):
         self.Xb = np.array([0, 0, 0]) # Current body position
         self.Q = np.array([1, 0, 0, 0]) # Current body rotation
 
-        self.blob_x0 = np.empty(0)
-        self.blob_x = np.empty(0)
+        self.dot_mk_r0 = np.empty(0)
+        self.dot_mk_r = np.empty(0)
 
         self.mesh_0 = None
         self.mesh = None
 
-        self.blob_surfaces = np.empty(0)
-        self.surface_blobs = np.empty(0)
-        self.blob_s = np.empty(0)
+        self.dot_surfaces = np.empty(0)
+        self.surface_dots = np.empty(0)
+        self.dot_mk_s = np.empty(0)
+
+        self.aruco_markers_0 = [] # list of aruco_marker instances
+        self.aruco_markers = []
 
         self.n_faces = []
         self.normal_mags = np.empty(0)
@@ -95,51 +106,62 @@ class BodySTL:
         self.Xb = np.array([0,0,0])
         #  self.mesh_o = copy.copy(self.mesh)
 
-    def add_blobs(self, coords: np.array, sizes: np.array):
-        """
-        Add blob data to geometry
+    def _associate_point_with_surface(self, point):
+        scale = np.mean(la.norm(self.mesh_0.normals,axis=1))**0.5
+        plane_offsets = -1*np.diag(self.mesh_0.vectors[:,0,:]@(self.mesh_0.normals.T))
 
-        Blobs are added by XYZ coordinates and diameters. Each blob is then
+        distances = np.abs(self.mesh_0.normals@point + plane_offsets)\
+            /np.abs(la.norm(self.mesh_0.normals))
+        if np.min(distances) > scale/100:
+            print("WARNING: point", point, "is greater than 1% units from surface")
+        # Candidate surfaces where dot marker almost lies on plane
+        candidates = np.where((distances - np.min(distances))<scale/100)[0]
+        # If more than one candidate, find the surface with the closest
+        # points to the dot marker
+        if len(candidates)>1:
+            av_dists = np.mean(np.linalg.norm(point-self.mesh_0.vectors[[candidates]],axis=3),axis=2)[0]
+            point_surface = candidates[np.argmin(av_dists)]
+        else:
+            point_surface = candidates[0]
+        return point_surface
+
+    def add_dot_markers(self, coords: np.array, sizes: np.array):
+        """
+        Add dot marker data to geometry
+
+        Dot markers are added by XYZ coordinates and diameters. Each dot is then
         assocaited with a body surface, which controls its visibility for
         2D projections.
 
         Parameters
         ----------
         coords : np.array
-            A 2-dimensional array of size (nx3) of XYZ blob coordinates,
+            A 2-dimensional array of size (nx3) of XYZ dot coordinates,
             relative to the body centroid.
         sizes : np.arrary
             A 1-dimensional array of sizes
         """
-        self.blob_x0 = coords.astype(float)
-        self.blob_s = sizes.astype(float)
+        self.dot_mk_r0 = coords.astype(float)
+        self.dot_mk_s = sizes.astype(float)
 
-        # Associate each blob with a surface
-        blob_surfaces = []
-        scale = np.mean(la.norm(self.mesh_0.normals,axis=1))**0.5
-        # Plane offset from origin
-        plane_offsets = -1*np.diag(self.mesh_0.vectors[:,0,:]@(self.mesh_0.normals.T))
-        for i,x in enumerate(self.blob_x0):
-            # Distances from blob to closest point on surface planes
-            distances = np.abs(self.mesh_0.normals@x + plane_offsets)\
-                /np.abs(la.norm(self.mesh_0.normals))
-            if np.min(distances) > scale/100:
-                print("WARNING: Blob",i," greater than 1% units from surface")
-            # Candidate surfaces where blob almost lies on plane
-            candidates = np.where((distances - np.min(distances))<scale/100)[0]
-            # If more than one candidate, find the surface with the closest
-            # points to the blob
-            if len(candidates)>1:
-                av_dists = np.mean(np.linalg.norm(x-self.mesh_0.vectors[[candidates]],axis=3),axis=2)[0]
-                blob_surfaces.append(candidates[np.argmin(av_dists)])
-            else:
-                blob_surfaces.append(candidates[0])
-        self.blob_surfaces = np.array(blob_surfaces)
-        # Create a reference of the blobs (by index) on each surface
-        self.surface_blobs = [[] for _ in range(self.n_faces)]
-        for i,blob_surface in enumerate(self.blob_surfaces):
-            self.surface_blobs[blob_surface].append(i)
-        self.surface_blobs = np.array(self.surface_blobs, dtype=object)
+        # Associate each dot with a surface
+        dot_surfaces = []
+        for i,x in enumerate(self.dot_mk_r0):
+            surface = self._associate_point_with_surface(x)
+            dot_surfaces.append(surface)
+
+        self.dot_surfaces = np.array(dot_surfaces)
+        # Create a reference of the dots (by index) on each surface
+        self.surface_dots = [[] for _ in range(self.n_faces)]
+        for i, dot_surface in enumerate(self.dot_surfaces):
+            self.surface_dots[dot_surface].append(i)
+        self.surface_dots = np.array(self.surface_dots, dtype=object)
+
+    def add_aruco_code(self, aruco_id, coords, R):
+        # Use first point of aruco coord to associate with surface
+        surface = self._associate_point_with_surface(coords[0])
+        aruco_mk = ArucoMarker(aruco_id, coords, surface, R)
+        self.aruco_markers_0.append(aruco_mk)
 
     def initialise(self,
                    X0: Union[np.array, List[float]],
@@ -150,7 +172,22 @@ class BodySTL:
         self.mesh_0.rotate_using_matrix(T_BL.T, point=self.Xb)
 
         self.mesh = copy.deepcopy(self.mesh_0)
-        self.blob_x = copy.deepcopy(self.blob_x0)
+        self.points = self.points0.copy()
+        self.dot_mk_r = copy.deepcopy(self.dot_mk_r0)
+        self.aruco_markers = copy.deepcopy(self.aruco_markers_0)
+        self.aruco_dict = {a.aruco_id: a for a in self.aruco_markers}
+        self.aruco_surface_dict = {i:[] for i in range(self.n_faces)}
+        for a in self.aruco_markers:
+            self.aruco_surface_dict[a.surface].append(a)
+        self.origin_vecs = np.array([[[0.01, 0, 0],
+                                      [0, 0, 0]],
+                                     [[0, 0.01, 0],
+                                      [0, 0, 0]],
+                                     [[0, 0, 0.01],
+                                      [0, 0, 0]]
+                                     ])
+        self.body_vecs = self.origin_vecs.copy() 
+
 
     def update(self, Xb: np.array, Qb: np.array):
         """
@@ -169,8 +206,17 @@ class BodySTL:
         self.Xb = Xb
         T_L = quaternion_to_rotation_tensor(*Qb)
         self.vectors[:,:,:] = self.to_ndarray(T_L@self.to_vectors(self.vectors0)) + Xb.reshape(-1,1).T
+        self.points  = (T_L@self.points0.T).T + Xb
+
         self.normals[:,:] = (T_L@self.normals0.T).T
-        self.blob_x[:,:] = (T_L@self.to_vectors(self.blob_x0)).T.reshape(-1,3) + Xb.reshape(-1,1).T
+        self.dot_mk_r[:,:] = (T_L@self.to_vectors(self.dot_mk_r0)).T.reshape(-1,3) + Xb.reshape(-1,1).T
+        # TODO: This may only pass a reference and not update - check
+        for marker, marker_0 in zip(self.aruco_markers, self.aruco_markers_0):
+            marker.points[:,:] = (T_L@self.to_vectors(marker_0.points)).T.reshape(-1,3) + Xb.reshape(-1,1).T
+
+        for i in range(3):
+            self.body_vecs[i,:,:] = (T_L@self.origin_vecs[i].T + Xb.reshape(-1,1)).T
+
 
     #  def project_blobs(self, Xb: np.array, Q: np.array):
         #  T_L = quaternion_to_rotation_tensor(*Q)
@@ -178,26 +224,39 @@ class BodySTL:
         #  blobs = (T_L@self.to_vectors(blobs)).T.reshape(-1,3) + Xb.reshape(-1,1).T
         #  return blobs
 
-    def plot(self):
+    def plot(self, block=False):
         #TODO: This could be cleaned up, to remove attribute checking
         if not hasattr(self, 'fig'):
-            #  self.fig = vpl.QtFigure(name='Body mesh plot')
+            #  self.fig = vpl.QtFigure2(name='Body mesh plot')
             self.fig = vpl.figure(name='Body mesh plot')
             self.fig.camera.SetParallelProjection(1)
             self.q0 = np.array([1, 0, 0, 0])
             self.view_dict = vpl.view(camera_direction=[0,0,-1], up_view=[1, 0, 0])
             self.q0 = self.get_camera_angle()
-            vpl.gcf().update()
-            vpl.reset_camera(fig=self.fig)
+            #  vpl.gcf().update()
+            #  vpl.reset_camera(fig=self.fig)
         if hasattr(self, 'mesh_plot'):
             self.fig -= self.mesh_plot
-        if hasattr(self, 'blob_plot'):
-            self.fig -= self.blob_plot
-        self.blob_plot = vpl.scatter(self.blob_x, color='k', fig=self.fig, radius=self.blob_s)
+        if hasattr(self, 'dot_plot'):
+            self.fig -= self.dot_plot
+        if hasattr(self, 'aruco_plot'):
+            self.fig -= self.aruco_plot
+        self.dot_plot = vpl.scatter(self.dot_mk_r, color='k', fig=self.fig, radius=self.dot_mk_s)
+        self.aruco_plot = vpl.plot(self.aruco_points, color='r', fig=self.fig)
         self.mesh_plot = vpl.mesh_plot(self, fig=self.fig, opacity=1)
-        vpl.reset_camera(fig=self.fig)
+
+        vpl.text3d('top',np.array([0, 0, 0.0146]), scale=1e-3, color='k', fig=self.fig)
+        vpl.text3d('front',np.array([0.0146, 0, 0.0]), scale=1e-3, color='k', fig=self.fig)
+        vpl.text3d('back',np.array([-0.0146, 0, 0]), scale=1e-3, color='k', fig = self.fig)
+        vpl.text3d('bottom',np.array([0, 0, -0.0146]), scale=1e-3, color='k', fig = self.fig)
+        vpl.text3d('left',np.array([0, 0.0146, 0.0]), scale=1e-3, color='k', fig=self.fig)
+        vpl.text3d('right',np.array([0, -0.0146, 0.]), scale=1e-3, color='k', fig = self.fig)
+        
+        #  self.mesh_plot = vpl.plot(self, fig=self.fig, opacity=1)
+        #  vpl.reset_camera(fig=self.fig)
         vpl.gcf().update()
-        self.fig.show(block=False)
+        vpl.zoom_to_contents()
+        self.fig.show(block=block)
 
     def get_camera_angle(self):
         #  q0 = (0.7071067811865476, -0.7071067811865475, 0.0, 0.0)
@@ -229,8 +288,21 @@ class BodySTL:
         return self.mesh.data['vectors']
 
     @property
-    def blobs(self):
-        return self.blob_x
+    def dots(self):
+        return self.dot_mk_r
+
+    @property
+    def arucos(self):
+        return self.aruco_markers
+
+    @property
+    def aruco_id_dict(self):
+        return self.aruco_dict
+
+    @property
+    def aruco_points(self):
+        x = np.concatenate([a.points for a in self.aruco_markers])
+        return x
 
     @property
     def normals0(self):
@@ -239,6 +311,10 @@ class BodySTL:
     @property
     def vectors0(self):
         return self.mesh_0.data['vectors']
+
+    @property
+    def points0(self):
+        return  np.unique(self.mesh_0.points.reshape(-1,3), axis=0)
 
     def to_vectors(self, x):
         return x.reshape(-1, 3).T
@@ -254,16 +330,24 @@ class BodySTL:
         return (self.normals.T/self.normal_mags).T
 
     @property
-    def blob_surfs(self):
-        return self.blob_surfaces
+    def dot_surfs(self):
+        return self.dot_surfaces
 
     @property
-    def blob_sizes(self):
-        return self.blob_s
+    def body_points(self):
+        return self.points
 
     @property
-    def surf_blobs(self):
-        return self.surface_blobs
+    def dot_sizes(self):
+        return self.dot_mk_s
+
+    @property
+    def surf_dots(self):
+        return self.surface_dots
+
+    @property
+    def unit_vecs(self):
+        return self.body_vecs
 
     def to_mesh(self, x):
         return self.to_ndarray(x)

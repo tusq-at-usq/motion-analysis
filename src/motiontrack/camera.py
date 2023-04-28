@@ -5,7 +5,7 @@
 Note that all geometry creation/projection is done in local coordinates
 The local level coordinate system is defined as:
 
-         / | \ 1 (Forward/North)
+          /|\ 1 (Forward/North)
            |
            |
    <-------o 3 (Upwards/out of earth)
@@ -17,7 +17,7 @@ Thsi shouldn't be confused with common body coordiante system such as the vehicl
     | \
     |   \
     |    _\| 2 (right wing)
-   \ /
+    \/
    3 (down)
 
 
@@ -27,6 +27,7 @@ First created: Jan 2022
 """
 from typing import List, Tuple
 import numpy as np
+import cv2 as cv
 
 from motiontrack.utils import euler_to_quaternion
 from motiontrack.features import BlobsFrame
@@ -81,11 +82,13 @@ class CameraCalibration:
         self.set_extrinsic(R, T)
 
 
-    # Outdated opencv implementation
-    #  def _project(self, X, R_C=None):
+    #  Outdated opencv implementation
+    #  def _project(self, X, R_C=None, T=None):
         #  if R_C is None:
             #  R_C = self.R
-        #  Y = cv.projectPoints(self.R_L@X, R_C, self.T, self.mtx, self.dist)
+        #  if T is None:
+            #  T = self.T
+        #  Y = cv.projectPoints(self.R_L@X, R_C, T, self.mtx, self.dist)
         #  Y = Y[0].reshape(-1,2)
         #  return Y
 
@@ -203,27 +206,27 @@ class CameraView:
         y = self.cal.project(x).T
         return y
 
-    def get_visible_blobs(self, angle_threshold: float=0.05):
+    def get_visible_dots(self, angle_threshold: float=0.05):
         dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
         visible_surfs = np.where(dot_prods > angle_threshold)[0]
-        visible_blobs = np.array([j for i in visible_surfs \
-                                  for j in self.body.surface_blobs[i]])
-        return visible_blobs
+        visible_dots = np.array([j for i in visible_surfs \
+                                  for j in self.body.surface_dots[i]])
+        return visible_dots
 
-    def get_blobs(self, angle_threshold: float=0.05) -> BlobsFrame:
+    def get_dots(self, angle_threshold: float=0.05) -> BlobsFrame:
         """
-        Get the pixel locations of blobs in 2-dimensional XY coordinates
+        Get the pixel locations of dots in 2-dimensional XY coordinates
 
         Process:
         1. Find which surfaces have a normal above thrshold
-        2. Calculate blob projection onto 2D plane
-        3. Caluclate blob sizes using dot product
+        2. Calculate dot projection onto 2D plane
+        3. Caluclate dot sizes using dot product
 
         Parameters
         ----------
         angle_threshold : float, default = 0.01
             The threshold of the dot product between view unit vector
-            and face normal vector for which blobs are hidden.
+            and face normal vector for which dots are hidden.
 
         Returns
         ----------
@@ -233,16 +236,16 @@ class CameraView:
         """
         dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
         visible_surfs = np.where(dot_prods > angle_threshold)[0]
-        visible_blobs = np.array([j for i in visible_surfs \
-                                  for j in self.body.surface_blobs[i]])
+        visible_dots = np.array([j for i in visible_surfs \
+                                  for j in self.body.surface_dots[i]])
 
-        visible_blobs_xyz = self.body.blobs[visible_blobs].T
-        blob_2d = self._transform(visible_blobs_xyz).T
+        visible_dots_xyz = self.body.dots[visible_dots].T
+        dots_2d = self._transform(visible_dots_xyz).T
 
-        blob_sizes = self.body.blob_sizes[visible_blobs]*\
-            dot_prods[self.body.blob_surfaces[visible_blobs]].T[0]
+        dot_sizes = self.body.dot_sizes[visible_dots]*\
+            dot_prods[self.body.dot_surfaces[visible_dots]].T[0]
 
-        return BlobsFrame(blob_2d, blob_sizes)
+        return BlobsFrame(dots_2d, dot_sizes)
 
     def get_mesh(self,
                  angle_threshold: float=0.05,
@@ -256,7 +259,7 @@ class CameraView:
         ----------
         angle_threshold : float, default = 0.01
             The threshold of the dot product between view unit vector
-            and face normal vector for which blobs are hidden.
+            and face normal vector for which surfaces are hidden.
 
         Returns
         -------
@@ -277,6 +280,7 @@ class CameraView:
     def get_uncorrected_mesh(self,
                              angle_threshold: float=0,
                              visible_surfs: np.array = None) -> Tuple[np.array, np.array]:
+        # TODO: Docstring
 
         if visible_surfs is None:
             dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
@@ -287,6 +291,33 @@ class CameraView:
         visible_angles = dot_prods[visible_surfs]
         return visible_mesh, visible_angles
 
+    def get_arucos_by_id(self, ids):
+        arucos = [self.body.aruco_id_dict[i] for i in ids]
+        aruco_points = [self._transform(a.points.T).T for a in arucos]
+        return aruco_points
+
+    def get_aruco_R_by_id(self, ids):
+        arucos = [self.body.aruco_id_dict[i] for i in ids]
+        aruco_Rs = [a.R for a in arucos]
+        return aruco_Rs
+
+    def get_visible_arucos(self, angle_threshold=0.05):
+        # TODO: Docstring
+
+        dot_prods = self.body.unit_normals@self.s_LV.reshape(1,3).T
+        visible_surfs = np.where(dot_prods > angle_threshold)[0]
+        visible_arucos = []
+        for s in visible_surfs:
+            visible_arucos += self.body.aruco_surface_dict[s]
+        aruco_corners = [a.points for a in visible_arucos]
+        aruco_corners = np.array(aruco_corners).reshape(-1,3)
+        corners_2d = self._transform(aruco_corners.T).T
+        return corners_2d
+
+    def get_points(self):
+        points = self.body.body_points
+        points = self._transform(points.T)
+        return points
 
     def get_CoM(self) -> np.array:
         """
@@ -301,11 +332,15 @@ class CameraView:
         cent_coords = self._transform(centroid)
         return cent_coords
 
-    def project(self, X, Q):
+    def get_body_vecs(self):
+        body_vecs = [self._transform(v.T) for v in self.body.unit_vecs]
+        return body_vecs
+
+    def project(self, X, Q, threshold=0.05):
         self.body.update(X, Q)
-        blob_frame = self.get_blobs()
+        dot_frame = self.get_dots(threshold)
         mesh = self.get_mesh()
-        return blob_frame, mesh
+        return dot_frame, mesh
 
 
 

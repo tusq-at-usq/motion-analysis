@@ -1,10 +1,8 @@
 import sys
 import numpy as np
-#  import PyQt6
-import PyQt5
+import PyQt6
 from pyqtgraph import PlotWidget, plot, QtCore
 import pyqtgraph as pg
-import pyqtgraph.exporters
 
 class PlotMatch:
     def __init__(self, name, resolution=None):
@@ -50,10 +48,6 @@ class PlotMatch:
         self.frame_pr = pg.PlotCurveItem(pen=pg.mkPen(width=1))
         self.edges = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='orange'))
 
-        self.vec1 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='r'))
-        self.vec2 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='b'))
-        self.vec3 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='g'))
-
         self.image = pg.ImageItem()
 
         self.view.addItem(self.image)
@@ -64,12 +58,6 @@ class PlotMatch:
         self.view.addItem(self.dot_CoM)
         self.view.addItem(self.frame_pr)
         self.view.addItem(self.edges)
-
-        self.view.addItem(self.vec1)
-        self.view.addItem(self.vec2)
-        self.view.addItem(self.vec3)
-
-                        
 
     def invert(self,Y):
         # Invert Y axis from downwards-positive openCV axis system
@@ -122,18 +110,9 @@ class PlotMatch:
         #  self.image.setImage((im))
         self.app.processEvents()
 
-    def update_vectors(self, body_vecs):
-        self.vec1.setData(body_vecs[0][0], self.invert(body_vecs[0][1]))
-        self.vec2.setData(body_vecs[1][0], self.invert(body_vecs[1][1]))
-        self.vec3.setData(body_vecs[2][0], self.invert(body_vecs[2][1]))
 
     def close(self):
         self.view.close()
-
-    def export(self, prefix='unnamed', index=0, DIRECTORY="./"):
-        exporter = pg.exporters.ImageExporter( self.view.scene() )
-        #  exporter = pg.exporters.ImageExporter(self.app)
-        exporter.export(DIRECTORY+'/exports/'+prefix+'_'+str(index)+'.png')
 
     #  def update_projection(self, blob_data):
         #  blob_x = blob_data.points
@@ -144,7 +123,7 @@ class PlotMatch:
         #  self.blob_ass.setData(pair_data[:,0], pair_data[:,1])
         #  self.app.processEvents()
 
-     # def update_mesh(self, mesh, angles):
+    #  def update_mesh(self, mesh, angles):
         #  n_surf = mesh.shape[0]
         #  mesh = np.concatenate((mesh, mesh[:,0,:].reshape(n_surf,1,3)),axis=1)
         #  mesh = mesh.reshape(-1,3)
@@ -299,7 +278,7 @@ class PlotTrack:
         self.r.setData(t, x[self.x_dict['r']])
 
         self.a_x.setData(t, x[self.x_dict['a_x']])
-        self.a_y.setData(t, x[self.x_dict['a_y']])
+        self.a_y.setData(t, x[self.x_dict['a_x']])
         self.a_z.setData(t, x[self.x_dict['a_z']])
 
         self.app.processEvents()
@@ -377,6 +356,9 @@ class PlotTrack:
 
         self.app.processEvents()
 
+    def save_plots(self, index):
+        exporter = pg.exporters.ImageExporter(self.view)
+        exporter.export('test.png')
 
     def close(self):
         self.win.close()

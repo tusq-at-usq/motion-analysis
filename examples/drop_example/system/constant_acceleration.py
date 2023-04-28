@@ -103,9 +103,10 @@ class Physics6DoF(Block):
 
 model = Physics6DoF()
 backend = SymbolDatabase()
-breakpoint()
 
 X, P, f, sym_dict = simplify_system(backend,model)
 dsys = DynamicSystem(X,P,f,sym_dict)
 dsys.save("constant_acceleration")
+
+print("Successfully saved system")
 

@@ -118,7 +118,11 @@ def test_projection():
     np.testing.assert_almost_equal(blob_data_t[-1], blob_data_t_true)
     np.testing.assert_almost_equal(blob_data_e[-1], blob_data_e_true)
 
+    return body
+
 if __name__=='__main__':
 
-    test_projection()
+    body = test_projection()
+    body.plot()
+    input("Press to continue")
 

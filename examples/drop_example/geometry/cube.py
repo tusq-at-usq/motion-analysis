@@ -20,5 +20,7 @@ def make_cube():
     return body
 
 if __name__ == "__main__":
-    make_cube()
+    body = make_cube()
+
+
 

@@ -119,7 +119,7 @@ def quaternion_multiply(q_mul: np.array, q0: np.array) -> np.array:
     q2 = q2/np.linalg.norm(q2)
     return q2
 
-def quaternion_subtract(q0: np.array, q_sub: np.array) -> np.array:
+def quaternion_subtract(q_from: np.array, q_to: np.array) -> np.array:
     """
     Quaternion subtraction
 
@@ -140,12 +140,12 @@ def quaternion_subtract(q0: np.array, q_sub: np.array) -> np.array:
     Q_diff: np.array
         Resultant quaternion
     """
-    Q0 = quaternion_to_matrix(q0)
-    Q_sub = quaternion_to_matrix(q_sub)
-    Q_diff = Q0 @ np.linalg.inv(Q_sub)
-    q2 = Q_diff[0,:]
-    q2 = q2/np.linalg.norm(q2)
-    return q2
+    Q_from = quaternion_to_matrix(q_from)
+    Q_to = quaternion_to_matrix(q_to)
+    Q_diff = np.linalg.inv(Q_from) @ Q_to
+    q_diff = Q_diff[:,0]
+    q_diff = q_diff/np.linalg.norm(q_diff)
+    return q_diff
 
 #  def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
 def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
@@ -221,3 +221,19 @@ def euler_to_rotation_tensor(psi: float, theta: float, phi: float) -> np.array:
     Q = euler_to_quaternion(psi, theta, phi)
     R = quaternion_to_rotation_tensor(*Q)
     return R
+
+def quaternion_weighted_av(qs, ws):
+    #  qw = [q*(w**0.5) for q,w in zip(qs,ws)]
+    QW = np.array(qs).T
+    W = np.eye(len(ws))*ws
+    A = QW@W@(QW.T)
+    eigvals, eigvecs = np.linalg.eig(A)
+    i = np.argmax(eigvals)
+    q_i = eigvecs[:,i]
+    q_av = q_i/np.linalg.norm(q_i)
+    return q_av
+
+def tensor_to_quaternion(tensor):
+    Q = R.from_matrix(tensor).as_quat()
+    Q = np.array([Q[3], Q[0], Q[1], Q[2]])
+    return Q
