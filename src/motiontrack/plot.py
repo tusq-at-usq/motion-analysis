@@ -33,13 +33,13 @@ class PlotMatch:
         self.view.setAspectLocked(True)
         self.view.show()
 
-        self.dot_ob = pg.ScatterPlotItem(pen=pg.mkPen(width=20, color='r'),
-                                              symbol='o', size=1)
-        self.dot_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=10, color='b'),
+        self.dot_ob = pg.ScatterPlotItem(pen=pg.mkPen(width=15, color='r'),
+                                              symbol='o', size=1.5)
+        self.dot_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=10, color='g'),
                                            symbol='o', size=1)
 
-        self.aruco_ob = pg.ScatterPlotItem(pen=pg.mkPen(width=20, color='r'),
-                                              symbol='o', size=1)
+        self.aruco_ob = pg.ScatterPlotItem(pen=pg.mkPen(width=15, color='r'),
+                                              symbol='o', size=1.5)
         self.aruco_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=10, color='g'),
                                            symbol='o', size=1)
 
@@ -47,12 +47,12 @@ class PlotMatch:
         self.dot_CoM = pg.ScatterPlotItem(pen=pg.mkPen(width=15, color='g'),
                                            symbol='o', size=1)
 
-        self.frame_pr = pg.PlotCurveItem(pen=pg.mkPen(width=1))
+        self.frame_pr = pg.PlotCurveItem(pen=pg.mkPen(width=1, color='white'))
         self.edges = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='orange'))
 
-        self.vec1 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='r'))
-        self.vec2 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='b'))
-        self.vec3 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='g'))
+        self.vec1 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='g'))
+        self.vec2 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='r'))
+        self.vec3 = pg.PlotCurveItem(pen=pg.mkPen(width=2, color='b'))
 
         self.image = pg.ImageItem()
 
@@ -197,9 +197,9 @@ class PlotTrack:
         self.q = pg.PlotCurveItem(pen=pg.mkPen(9, width=1))
         self.r = pg.PlotCurveItem(pen=pg.mkPen(10, width=1))
 
-        self.a_x = pg.PlotCurveItem(pen=pg.mkPen(1, width=1))
-        self.a_y = pg.PlotCurveItem(pen=pg.mkPen(2, width=1))
-        self.a_z = pg.PlotCurveItem(pen=pg.mkPen(3, width=1))
+        self.a_x = pg.PlotCurveItem(pen=pg.mkPen(11, width=1))
+        self.a_y = pg.PlotCurveItem(pen=pg.mkPen(12, width=1))
+        self.a_z = pg.PlotCurveItem(pen=pg.mkPen(13, width=1))
 
 
         sm_pen = pg.mkPen(0.2, style=QtCore.Qt.PenStyle.DashLine, width=1)

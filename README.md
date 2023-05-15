@@ -76,6 +76,7 @@ More to come...
 
 motion-analysis is being developed along the following roadmap:
 
+* [ ] Fix tests to comply with updated code
 * [ ] Create block-based dynamic system builder
 * [ ] Provide more examples
 * [ ] Provide test modules and auto-test on push
