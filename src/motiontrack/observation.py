@@ -102,6 +102,10 @@ class Observation:
         t_next = self._get_next_t()
         return t_next
 
+    @property
+    def next_t(self):
+        return self.get_next_t()
+
     def create_ob_fn(self, x_dict: dict, u_dict: dict, x_pr: np.array = np.empty(0)) -> Callable:
         """
         Create an observable function used in the Kalman filter,
@@ -258,7 +262,7 @@ def get_next_obs_group(obs_all: List[Observation], t: float, dt_min: float)\
     return obs_next, nz
 
 
-def get_next_t(data_iterators, t: float):
+def get_next_t(data_iterators):
     ts = []
     for d in data_iterators:
         ts.append(d.next_t)

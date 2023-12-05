@@ -148,6 +148,7 @@ def quaternion_subtract(q_from: np.array, q_to: np.array) -> np.array:
     return q_diff
 
 #  def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
+
 def euler_to_quaternion(psi: float, theta: float, phi: float) -> List[float]:
     """
     Euler angles to quaternion

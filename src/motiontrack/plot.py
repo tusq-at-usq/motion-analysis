@@ -221,6 +221,10 @@ class PlotTrack:
         self.q_sm = pg.PlotCurveItem(pen=sm_pen)
         self.r_sm = pg.PlotCurveItem(pen=sm_pen)
 
+        self.a_x_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.a_y_sm = pg.PlotCurveItem(pen=sm_pen)
+        self.a_z_sm = pg.PlotCurveItem(pen=sm_pen)
+
         self.x_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=5, color=1),
                                               symbol='o', size=1)
         self.y_pr = pg.ScatterPlotItem(pen=pg.mkPen(width=5, color=2),
@@ -277,6 +281,9 @@ class PlotTrack:
         self.p5.addItem(self.a_x)
         self.p5.addItem(self.a_y)
         self.p5.addItem(self.a_z)
+        self.p5.addItem(self.a_x_sm)
+        self.p5.addItem(self.a_y_sm)
+        self.p5.addItem(self.a_z_sm)
 
     def update_state(self, x, t):
         x = np.array(x).T
@@ -375,6 +382,9 @@ class PlotTrack:
         self.q_sm.setData(t, x_smoothed[self.x_dict['q']])
         self.r_sm.setData(t, x_smoothed[self.x_dict['r']])
 
+        self.a_x_sm.setData(t, x_smoothed[self.x_dict['a_x']])
+        self.a_y_sm.setData(t, x_smoothed[self.x_dict['a_y']])
+        self.a_z_sm.setData(t, x_smoothed[self.x_dict['a_z']])
         self.app.processEvents()
 
 
